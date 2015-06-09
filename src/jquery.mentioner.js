@@ -8,10 +8,13 @@
 (function ($) {
   'use strict';
 
-  $.fn.mentioner = function () {
-    return this.each(function (i) {
-      // Do something to each selected element.
-      $(this).html('jquery.mentioner' + i);
+  $.fn.mentioner = function (settings) {
+    return this.each(function () {
+      var $subject = $( this );
+
+      if($subject.data('mentioner') === undefined) {
+        $subject.data('mentioner', settings);
+      }
     });
   };
 }(jQuery));

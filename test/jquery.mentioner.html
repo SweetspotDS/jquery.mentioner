@@ -5,23 +5,31 @@
     <title>jquery.mentioner Test Suite</title>
     <!-- Load local jQuery. -->
     <script src="../bower_components/jquery/jquery.js"></script>
-    <!-- Load local QUnit. -->
-    <link rel="stylesheet" href="../bower_components/qunit/qunit/qunit.css" media="screen">
-    <script src="../bower_components/qunit/qunit/qunit.js"></script>
+    <!-- Load local Mocha. -->
+    <script src="../bower_components/mocha/mocha.js"></script>
+    <!-- Load local Chai. -->
+    <script src="../bower_components/chai/chai.js"></script>
+    <!-- Setup Mocha and Chai. -->
+    <script>
+      var should = chai.should();
+      mocha.setup('bdd');
+      mocha.run();
+    </script>
     <!-- Load local lib and tests. -->
     <script src="../src/jquery.mentioner.js"></script>
-    <script src="jquery.mentioner_test.js"></script>
+    <script src="jquery.mentioner.spec.js"></script>
     <!-- Removing access to jQuery and $. But it'll still be available as _$, if
          you REALLY want to mess around with jQuery in the console. REMEMBER WE
          ARE TESTING A PLUGIN HERE, THIS HELPS ENSURE BEST PRACTICES. REALLY. -->
     <script>window._$ = jQuery.noConflict(true);</script>
   </head>
   <body>
-    <div id="qunit"></div>
-    <div id="qunit-fixture">
-      <textarea class="js-textarea-1"></textarea>
-      <textarea class="js-textarea-2"></textarea>
-      <textarea class="js-textarea-3"></textarea>
+    <div id="mocha">
+      <div class="js-textareas-collection">
+        <textarea class="js-textarea-1"></textarea>
+        <textarea class="js-textarea-2"></textarea>
+        <textarea class="js-textarea-3"></textarea>
+      </div>
     </div>
   </body>
 </html>

@@ -37,10 +37,12 @@ module.exports = function (grunt) {
         dest: 'dist/jquery.<%= pkg.name %>.min.js'
       }
     },
-    qunit: {
-      all: {
+    mocha: {
+      test: {
+        src: ['test/<%= pkg.name %>.html'],
         options: {
-          urls: ['http://localhost:9000/test/<%= pkg.name %>.html']
+          log: true,
+          run: true
         }
       }
     },
@@ -91,6 +93,8 @@ module.exports = function (grunt) {
     }
   });
 
+  grunt.loadNpmTasks('grunt-mocha');
+
   // Default task.
   grunt.registerTask('default', ['jshint', 'connect', 'qunit', 'clean', 'concat', 'uglify']);
   grunt.registerTask('server', function () {
@@ -98,5 +102,5 @@ module.exports = function (grunt) {
     grunt.task.run(['serve']);
   });
   grunt.registerTask('serve', ['connect', 'watch']);
-  grunt.registerTask('test', ['jshint', 'connect', 'qunit']);
+  grunt.registerTask('test', ['jshint', 'mocha']);
 };

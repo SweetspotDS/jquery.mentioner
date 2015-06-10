@@ -12,8 +12,7 @@
 
     it('has mentioner data', function() {
       elems.mentioner({ mock: "data" }).each(function() {
-        var mentionerData = $(this).data('mentioner');
-        mentionerData.should.eql({ mock: "data" });
+        $(this).data('mentioner').should.exist;
       });
     });
   });

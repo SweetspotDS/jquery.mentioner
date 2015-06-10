@@ -10,8 +10,8 @@
       elems.mentioner().should.equal(elems);
     });
 
-    it('has mentioner data', function() {
-      elems.mentioner({ mock: "data" }).each(function() {
+    it('has a mentioner object attached', function() {
+      elems.mentioner().each(function() {
         $(this).data('mentioner').should.exist;
       });
     });

@@ -30,13 +30,23 @@
   };
 
   Mentioner.prototype._attachEvents = function() {
-    this.$root.on('keypress', this._onRootKeypress.bind(this));
+    /*
+     * Not using Function.prototype.bind because of incompatibilities
+     * with PhantomJS
+     *
+     * Related bug: https://github.com/ariya/phantomjs/issues/10522
+     */
+    this.$root.on('keypress', this._onRootKeypress());
   };
 
-  Mentioner.prototype._onRootKeypress = function(event) {
-    if(event.keyCode === AT_SIGN_KEY_CODE) {
-      this.showDropdown();
-    }
+  Mentioner.prototype._onRootKeypress = function() {
+    var that = this;
+
+    return function(event) {
+      if(event.keyCode === AT_SIGN_KEY_CODE) {
+        that.showDropdown();
+      }
+    };
   };
 
   Mentioner.prototype.getParentWrapper = function() {

@@ -1,0 +1,21 @@
+.dropdown {
+  margin: 0;
+  padding: 0;
+
+  background-color: white;
+  list-style-type: none;
+}
+
+.dropdown__item {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+
+  cursor: pointer;
+}
+
+.dropdown__item__name {
+  display: table-cell;
+  margin: 0;
+  width: 100%;
+}

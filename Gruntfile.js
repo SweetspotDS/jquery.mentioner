@@ -98,8 +98,12 @@ module.exports = function (grunt) {
     sass: {
       dist: {
         files: [{
-          src: ['src/sass/**/*.scss'],
-          dest: 'dist/<%= pkg.name %>.css'
+          expand: true,
+          cwd: 'src/sass',
+          src: ['*.scss'],
+          dest: 'dist',
+          ext: '.css',
+          extDot: 'last'
         }]
       }
     }

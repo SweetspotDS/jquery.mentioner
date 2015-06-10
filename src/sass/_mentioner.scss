@@ -1,0 +1,15 @@
+.mentioner {
+  position: relative;
+}
+
+.mentioner__dropdown {
+  border-width: 1px;
+  position: absolute;
+
+  border-color: black;
+  border-style: solid;
+
+  &--hidden {
+    display: none;
+  }
+}

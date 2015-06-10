@@ -74,6 +74,10 @@ module.exports = function (grunt) {
         files: '<%= jshint.gruntfile.src %>',
         tasks: ['jshint:gruntfile']
       },
+      sass: {
+        files: 'src/sass/**/*.scss',
+        tasks: ['sass']
+      },
       src: {
         files: '<%= jshint.src.src %>',
         tasks: ['jshint:src', 'mocha']
@@ -90,11 +94,19 @@ module.exports = function (grunt) {
           port: 9000
         }
       }
+    },
+    sass: {
+      dist: {
+        files: [{
+          src: ['src/sass/**/*.scss'],
+          dest: 'dist/<%= pkg.name %>.css'
+        }]
+      }
     }
   });
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'connect', 'mocha', 'clean', 'concat', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'connect', 'mocha', 'clean', 'concat', 'sass', 'uglify']);
   grunt.registerTask('server', function () {
     grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
     grunt.task.run(['serve']);

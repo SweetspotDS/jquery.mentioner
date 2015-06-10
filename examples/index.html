@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Examples for jquery.mentioner</title>
+    <script src="../bower_components/jquery/jquery.js"></script>
+    <script src="../src/jquery.mentioner.js"></script>
+  </head>
+  <body>
+    <textarea class="js-textarea"></textarea>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var $textarea = $( '.js-textarea' );
+
+        $textarea.mentioner({
+          onDataRequest: function() {
+            return [
+              {
+                name: "Jon Snow"
+              }
+            ];
+          }
+        });
+      });
+    </script>
+
+  </body>
+</html>

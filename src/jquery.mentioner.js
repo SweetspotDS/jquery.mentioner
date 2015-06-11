@@ -17,12 +17,13 @@
     this.$root = $root;
     this.mentionSymbol = settings.mentionSymbol || '@';
     this.mentionables = settings.onDataRequest ? settings.onDataRequest() : [];
+    this.matcher = settings.matcher || $.noop;
 
-    this._buildDOM();
-    this._attachEvents();
+    this.buildDOM();
+    this.attachEvents();
   };
 
-  Mentioner.prototype._buildDOM = function() {
+  Mentioner.prototype.buildDOM = function() {
     var $parent = $( '<div class="' + MENTIONER_WRAPPER_HOOK_CLASS + ' mentioner"></div>' );
     this.$root.wrap($parent);
 
@@ -30,18 +31,18 @@
     this.getParentWrapper().append($dropdown);
   };
 
-  Mentioner.prototype._attachEvents = function() {
+  Mentioner.prototype.attachEvents = function() {
     /*
      * Not using Function.prototype.bind because of incompatibilities
      * with PhantomJS
      *
      * Related bug: https://github.com/ariya/phantomjs/issues/10522
      */
-    this.$root.on('keydown', this._onRootKeydown());
-    this.$root.on('input', this._onRootInput());
+    this.$root.on('keydown', this.onRootKeydown());
+    this.$root.on('input', this.onRootInput());
   };
 
-  Mentioner.prototype._onRootKeydown = function() {
+  Mentioner.prototype.onRootKeydown = function() {
     var that = this;
 
     return function(event) {
@@ -51,23 +52,44 @@
     };
   };
 
-  Mentioner.prototype._onRootInput = function() {
+  Mentioner.prototype.onRootInput = function() {
     var that = this;
 
     return function() {
-      var query = that.$root.val();
-      var lastMentionSymbolIndex = query.lastIndexOf(that.mentionSymbol);
+      var text = that.$root.val();
+      var lastMentionSymbolIndex = text.lastIndexOf(that.mentionSymbol);
 
       if(lastMentionSymbolIndex > -1) {
-        var preMentionSymbolChar = query.charAt(lastMentionSymbolIndex - 1);
+        var preMentionSymbolChar = text.charAt(lastMentionSymbolIndex - 1);
 
-        // Prevent the dropdown to be shown when typing the mention symbol
-        // after alphanumeric characters
-        if(!(/\w/g).test(preMentionSymbolChar)) {
-          that.showDropdown();
+        if(that.isValidPreMentionSymbolChar(preMentionSymbolChar)) {
+          var query = text.slice(lastMentionSymbolIndex + 1);
+          that.search(query);
         }
+      } else {
+        that.hideDropdown();
       }
     };
+  };
+
+  Mentioner.prototype.isValidPreMentionSymbolChar = function(preMentionSymbolChar) {
+    // Prevent the dropdown to be shown when typing the mention symbol
+    // after alphanumeric characters
+    return !(/\w/g).test(preMentionSymbolChar);
+  };
+
+  Mentioner.prototype.search = function(query) {
+    var that = this;
+
+    var candidates = this.mentionables.filter(function(mentionable) {
+      return that.matcher.call(that, mentionable, query);
+    });
+
+    if(candidates.length > 0) {
+      this.showDropdown(candidates);
+    } else {
+      this.hideDropdown();
+    }
   };
 
   Mentioner.prototype.getParentWrapper = function() {
@@ -78,12 +100,12 @@
     return this.getParentWrapper().find('.' + MENTIONER_DROPDOWN_HOOK_CLASS);
   };
 
-  Mentioner.prototype.showDropdown = function() {
+  Mentioner.prototype.showDropdown = function(candidates) {
     var $dropdown = this.getDropdown().empty();
 
-    this._calculateStyleForDropdown($dropdown);
+    this.calculateStyleForDropdown($dropdown);
 
-    this.mentionables.forEach(function(mentionable) {
+    candidates.forEach(function(mentionable) {
       var $item = $( '<li class="dropdown__item"></li>' );
       var $name = $( '<p class="dropdown__item__name">' + mentionable.name + '</p>' );
 
@@ -95,18 +117,18 @@
     $dropdown.removeClass('mentioner__dropdown--hidden');
   };
 
-  Mentioner.prototype.hideDropdown = function() {
-    var $dropdown = this.getDropdown();
-    $dropdown.addClass('mentioner__dropdown--hidden');
-  };
-
-  Mentioner.prototype._calculateStyleForDropdown = function($dropdown) {
+  Mentioner.prototype.calculateStyleForDropdown = function($dropdown) {
     var top = this.$root.outerHeight() - 3;
     var left = 3;
     var width = this.$root.outerWidth() - 9;
 
     var style = 'top: ' + top + 'px; left: ' + left + 'px; width: ' + width + 'px;';
     $dropdown.attr('style', style);
+  };
+
+  Mentioner.prototype.hideDropdown = function() {
+    var $dropdown = this.getDropdown();
+    $dropdown.addClass('mentioner__dropdown--hidden');
   };
 
   $.fn.mentioner = function (settings) {

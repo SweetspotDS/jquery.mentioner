@@ -8,26 +8,35 @@
 (function ($) {
   'use strict';
 
-  var ESCAPE_KEY_CODE = 27;
+  var KEYS = {
+    ESC: 27,
+    UP: 38,
+    DOWN: 40
+  };
 
-  var MENTIONER_WRAPPER_HOOK_CLASS = 'js-mentioner-wrapper';
-  var MENTIONER_DROPDOWN_HOOK_CLASS = 'js-mentioner-dropdown';
+  var MENTIONER_HOOK_CLASSES = {
+    WRAPPER: 'js-mentioner-wrapper',
+    DROPDOWN: 'js-mentioner-dropdown',
+    DROPDOWN_ITEM: 'js-mentioner-dropdown-item'
+  };
 
   var Mentioner = function($root, settings) {
     this.$root = $root;
     this.mentionSymbol = settings.mentionSymbol || '@';
-    this.mentionables = settings.requester ? settings.requester() : [];
     this.matcher = settings.matcher || $.noop;
+    this.mentionables = (settings.requester ? settings.requester() : []).sort(function(prev, next){
+      return prev.name.localeCompare(next.name);
+    });
 
     this.buildDOM();
     this.attachEvents();
   };
 
   Mentioner.prototype.buildDOM = function() {
-    var $parent = $( '<div class="' + MENTIONER_WRAPPER_HOOK_CLASS + ' mentioner"></div>' );
+    var $parent = $( '<div class="' + MENTIONER_HOOK_CLASSES.WRAPPER + ' mentioner"></div>' );
     this.$root.wrap($parent);
 
-    var $dropdown = $( '<ul class="' + MENTIONER_DROPDOWN_HOOK_CLASS + ' mentioner__dropdown mentioner__dropdown--hidden dropdown"></ul>' );
+    var $dropdown = $( '<ul class="' + MENTIONER_HOOK_CLASSES.DROPDOWN + ' mentioner__dropdown mentioner__dropdown--hidden dropdown"></ul>' );
     this.getParentWrapper().append($dropdown);
   };
 
@@ -46,8 +55,18 @@
     var that = this;
 
     return function(event) {
-      if(event.keyCode === ESCAPE_KEY_CODE){
-        that.hideDropdown();
+      switch (event.keyCode) {
+        case KEYS.ESC:
+          that.hideDropdown();
+          break;
+        case KEYS.DOWN:
+          that.selectNextDropdownOption();
+        break;
+        case KEYS.UP:
+          that.selectPrevDropdownOption();
+        break;
+        default:
+          return;
       }
     };
   };
@@ -59,23 +78,36 @@
       var text = that.$root.val();
       var lastMentionSymbolIndex = text.lastIndexOf(that.mentionSymbol);
 
-      if(lastMentionSymbolIndex > -1) {
-        var preMentionSymbolChar = text.charAt(lastMentionSymbolIndex - 1);
-
-        if(that.isValidPreMentionSymbolChar(preMentionSymbolChar)) {
-          var query = text.slice(lastMentionSymbolIndex + 1);
-          that.search(query);
-        }
+      if(that.canBeSearchable(text, lastMentionSymbolIndex)) {
+        var query = text.slice(lastMentionSymbolIndex + 1);
+        that.search(query);
       } else {
         that.hideDropdown();
       }
     };
   };
 
+  Mentioner.prototype.canBeSearchable = function(text, lastMentionSymbolIndex) {
+    if(lastMentionSymbolIndex === -1) {
+      return false;
+    }
+
+    var preMentionSymbolChar = text.charAt(lastMentionSymbolIndex - 1);
+    var postMentionSymbolChar = text.charAt(lastMentionSymbolIndex  + 1);
+    var isValidPreMentionSymbolChar = this.isValidPreMentionSymbolChar(preMentionSymbolChar);
+    var isValidPostMentionSymbolChar = this.isValidPostMentionSymbolChar(postMentionSymbolChar);
+
+    return isValidPreMentionSymbolChar && isValidPostMentionSymbolChar;
+  };
+
   Mentioner.prototype.isValidPreMentionSymbolChar = function(preMentionSymbolChar) {
     // Prevent the dropdown to be shown when typing the mention symbol
     // after alphanumeric characters
     return !(/\w/g).test(preMentionSymbolChar);
+  };
+
+  Mentioner.prototype.isValidPostMentionSymbolChar = function(postMentionSymbolChar) {
+    return postMentionSymbolChar !== " ";
   };
 
   Mentioner.prototype.search = function(query) {
@@ -97,44 +129,74 @@
   };
 
   Mentioner.prototype.getDropdown = function() {
-    return this.getParentWrapper().find('.' + MENTIONER_DROPDOWN_HOOK_CLASS);
+    return this.getParentWrapper().find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN);
   };
 
   Mentioner.prototype.showDropdown = function(candidates) {
-    var $dropdown = this.getDropdown().empty();
+    var $dropdown = this.getDropdown();
+    var $dropdownOptionsToAppend = this.getDropdownOptionsToAppend($dropdown, candidates);
+    var style = this.getStyleForDropdown();
 
-    this.calculateStyleForDropdown($dropdown);
-
-    candidates.forEach(function(mentionable) {
-      var $item = $( '<li class="dropdown__item"></li>' );
-      var $name = $( '<p class="dropdown__item__name">' + mentionable.name + '</p>' );
-      var $avatar = $([
-        '<div class="dropdown__item__avatar">',
-          '<img class="dropdown__item__avatar__image" src="' + mentionable.avatar + '" />',
-        '</div>'
-      ].join("\n"));
-
-      $item.append($avatar);
-      $item.append($name);
-
-      $dropdown.append($item);
-    });
-
+    $dropdown.empty().append($dropdownOptionsToAppend);
+    $dropdown.attr('style', style);
     $dropdown.removeClass('mentioner__dropdown--hidden');
   };
 
-  Mentioner.prototype.calculateStyleForDropdown = function($dropdown) {
-    var top = this.$root.outerHeight() - 3;
-    var left = 3;
-    var width = this.$root.outerWidth() - 9;
+  Mentioner.prototype.getDropdownOptionsToAppend = function($dropdown, candidates) {
+    var that = this;
+    var $dropdownOptions = $dropdown.find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM);
 
-    var style = 'top: ' + top + 'px; left: ' + left + 'px; width: ' + width + 'px;';
-    $dropdown.attr('style', style);
+    return candidates.map(function(candidate) {
+      var $relatedDropdownOption = $dropdownOptions.filter(function() {
+        return $(this).data('mentionable-id') === candidate.id;
+      });
+
+      if($relatedDropdownOption.length !== 0) {
+        return $relatedDropdownOption;
+      } else {
+        return that.createDropdownOption(candidate);
+      }
+    });
+  };
+
+  Mentioner.prototype.createDropdownOption = function(mentionable) {
+    var $item = $( '<li class="' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM + ' dropdown__item"></li>' );
+    var $name = $( '<p class="dropdown__item__name">' + mentionable.name + '</p>' );
+    var $avatar = $([
+      '<div class="dropdown__item__avatar">',
+        '<img class="dropdown__item__avatar__image" src="' + mentionable.avatar + '" />',
+      '</div>'
+    ].join("\n"));
+
+    $item.append($avatar);
+    $item.append($name);
+    $item.data('mentionable-id', mentionable.id);
+
+    return $item;
+  };
+
+  Mentioner.prototype.getSelectedDropdownOption = function() {
+    return $( 'dropdown__item--selected' );
+  };
+
+  Mentioner.prototype.getStyleForDropdown = function() {
+    var top = this.$root.outerHeight() - 3;
+    var width = this.$root.innerWidth();
+
+    return 'top: ' + top + 'px; width: ' + width + 'px;';
   };
 
   Mentioner.prototype.hideDropdown = function() {
     var $dropdown = this.getDropdown();
     $dropdown.addClass('mentioner__dropdown--hidden');
+  };
+
+  Mentioner.prototype.selectPrevDropdownOption = function() {
+
+  };
+
+  Mentioner.prototype.selectNextDropdownOption = function() {
+
   };
 
   $.fn.mentioner = function (settings) {

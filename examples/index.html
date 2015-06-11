@@ -18,15 +18,21 @@
           onDataRequest: function() {
             return [
               {
-                name: "Jon Snow"
+                name: 'Jon Snow',
+                avatar: 'https://33.media.tumblr.com/avatar_b9a6fd7fe379_128.png'
               },
               {
-                name: "Daenerys Targaryen"
+                name: 'Daenerys Targaryen',
+                avatar: 'https://pbs.twimg.com/profile_images/608233434612383745/ssqmFf7f_normal.jpg'
               },
               {
-                name: "Tyrion Lannister"
+                name: 'Tyrion Lannister',
+                avatar: 'https://gp4.googleusercontent.com/-hBCcPT52DQk/AAAAAAAAAAI/AAAAAAAAAAA/22zJFbXDK6I/s48-c-k-no/photo.jpg?sz=50'
               }
             ];
+          },
+          matcher: function(mentionable, query) {
+            return mentionable.name.toLowerCase().indexOf(query.toLowerCase()) > -1;
           }
         });
       });

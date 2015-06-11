@@ -14,8 +14,28 @@
   cursor: pointer;
 }
 
-.dropdown__item__name {
+%dropdown__item__cell {
   display: table-cell;
+  vertical-align: middle;
+}
+
+.dropdown__item__name {
+  @extend %dropdown__item__cell;
+
   margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 80%;
+}
+
+.dropdown__item__avatar {
+  @extend %dropdown__item__cell;
+
+  width: 20%;
+}
+
+.dropdown__item__avatar__image {
+  vertical-align: middle;
   width: 100%;
 }

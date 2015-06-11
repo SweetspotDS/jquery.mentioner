@@ -108,7 +108,13 @@
     candidates.forEach(function(mentionable) {
       var $item = $( '<li class="dropdown__item"></li>' );
       var $name = $( '<p class="dropdown__item__name">' + mentionable.name + '</p>' );
+      var $avatar = $([
+        '<div class="dropdown__item__avatar">',
+          '<img class="dropdown__item__avatar__image" src="' + mentionable.avatar + '" />',
+        '</div>'
+      ].join("\n"));
 
+      $item.append($avatar);
       $item.append($name);
 
       $dropdown.append($item);

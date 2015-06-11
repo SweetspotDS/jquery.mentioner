@@ -16,7 +16,7 @@
   var Mentioner = function($root, settings) {
     this.$root = $root;
     this.mentionSymbol = settings.mentionSymbol || '@';
-    this.mentionables = settings.onDataRequest ? settings.onDataRequest() : [];
+    this.mentionables = settings.requester ? settings.requester() : [];
     this.matcher = settings.matcher || $.noop;
 
     this.buildDOM();

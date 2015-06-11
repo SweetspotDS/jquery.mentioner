@@ -15,7 +15,7 @@
         var $textarea = $( '.js-textarea' );
 
         $textarea.mentioner({
-          onDataRequest: function() {
+          requester: function() {
             return [
               {
                 name: 'Jon Snow',

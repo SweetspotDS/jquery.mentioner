@@ -11,7 +11,8 @@
   var KEYS = {
     ESC: 27,
     UP: 38,
-    DOWN: 40
+    DOWN: 40,
+    RETURN: 13
   };
 
   var MENTIONER_HOOK_CLASSES = {
@@ -54,19 +55,40 @@
   Mentioner.prototype.onRootKeydown = function() {
     var that = this;
 
+    var dropdownEventWrapper = function(callback) {
+      if(that.isDropdownDisplayed()) {
+        event.preventDefault();
+        callback.call(that);
+      }
+    };
+
     return function(event) {
       switch (event.keyCode) {
         case KEYS.ESC:
-          that.hideDropdown();
+          dropdownEventWrapper(function() {
+            this.hideDropdown();
+          });
           break;
         case KEYS.DOWN:
-          that.selectNextDropdownOption();
+          dropdownEventWrapper(function() {
+            this.selectOtherDropdownOption(function($selected) {
+              return $selected.next().length === 0 ? $selected.siblings().first() : $selected.next();
+            });
+          });
         break;
         case KEYS.UP:
-          that.selectPrevDropdownOption();
+          dropdownEventWrapper(function() {
+            this.selectOtherDropdownOption(function($selected) {
+              return $selected.prev().length === 0 ? $selected.siblings().last() : $selected.prev();
+            });
+          });
+        break;
+        case KEYS.RETURN:
+          // TODO It should take the selected dropdown option if the dropdown is displayed.
+          dropdownEventWrapper($.noop);
         break;
         default:
-          return;
+          return true;
       }
     };
   };
@@ -132,29 +154,49 @@
     return this.getParentWrapper().find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN);
   };
 
-  Mentioner.prototype.showDropdown = function(candidates) {
-    var $dropdown = this.getDropdown();
-    var $dropdownOptionsToAppend = this.getDropdownOptionsToAppend($dropdown, candidates);
-    var style = this.getStyleForDropdown();
-
-    $dropdown.empty().append($dropdownOptionsToAppend);
-    $dropdown.attr('style', style);
-    $dropdown.removeClass('mentioner__dropdown--hidden');
+  Mentioner.prototype.getDropdownOptions = function() {
+    return this.getDropdown().find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM);
   };
 
-  Mentioner.prototype.getDropdownOptionsToAppend = function($dropdown, candidates) {
-    var that = this;
-    var $dropdownOptions = $dropdown.find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM);
+  Mentioner.prototype.showDropdown = function(candidates) {
+    var $dropdownOptionsToAppend = this.getDropdownOptionsToAppend(candidates);
 
+    var $dropdown = this.getDropdown();
+    $dropdown.append($dropdownOptionsToAppend);
+    $dropdown.attr('style', this.getStyleForDropdown());
+    $dropdown.removeClass('mentioner__dropdown--hidden');
+
+    this.removeOrphanDropdownOptions(candidates);
+    this.checkSelectedDropdownOption();
+  };
+
+  Mentioner.prototype.getDropdownOptionsToAppend = function(candidates) {
+    var that = this;
     return candidates.map(function(candidate) {
-      var $relatedDropdownOption = $dropdownOptions.filter(function() {
-        return $(this).data('mentionable-id') === candidate.id;
+      var $relatedDropdownOption = that.getDropdownOptions().filter(function() {
+        var mentionable = $(this).data('mentionable');
+
+        return mentionable.id === candidate.id;
       });
 
       if($relatedDropdownOption.length !== 0) {
         return $relatedDropdownOption;
       } else {
         return that.createDropdownOption(candidate);
+      }
+    });
+  };
+
+  // Removes those old dropdown options which don't have a related candidate
+  Mentioner.prototype.removeOrphanDropdownOptions = function(candidates) {
+    this.getDropdownOptions().each(function() {
+      var mentionable = $(this).data('mentionable');
+      var candidate = candidates.filter(function(candidate) {
+        return candidate.id === mentionable.id;
+      })[0];
+
+      if(!candidate) {
+        $(this).remove();
       }
     });
   };
@@ -170,13 +212,24 @@
 
     $item.append($avatar);
     $item.append($name);
-    $item.data('mentionable-id', mentionable.id);
+    $item.data('mentionable', mentionable);
 
     return $item;
   };
 
+  Mentioner.prototype.checkSelectedDropdownOption = function() {
+    var $selected = this.getSelectedDropdownOption();
+
+    if($selected.length === 0) {
+      var $oldSelected = $();
+      var $newSelected = this.getDropdownOptions().first();
+
+      this.selectDropdownOption($oldSelected, $newSelected);
+    }
+  };
+
   Mentioner.prototype.getSelectedDropdownOption = function() {
-    return $( 'dropdown__item--selected' );
+    return $( '.dropdown__item--selected' );
   };
 
   Mentioner.prototype.getStyleForDropdown = function() {
@@ -191,12 +244,19 @@
     $dropdown.addClass('mentioner__dropdown--hidden');
   };
 
-  Mentioner.prototype.selectPrevDropdownOption = function() {
-
+  Mentioner.prototype.isDropdownDisplayed = function() {
+    return !this.getDropdown().hasClass('mentioner__dropdown--hidden');
   };
 
-  Mentioner.prototype.selectNextDropdownOption = function() {
+  Mentioner.prototype.selectOtherDropdownOption = function(getter) {
+    var $oldSelected = this.getSelectedDropdownOption();
+    var $newSelected = getter.call(this, $oldSelected);
+    this.selectDropdownOption($oldSelected, $newSelected);
+  };
 
+  Mentioner.prototype.selectDropdownOption = function($oldSelected, $newSelected) {
+    $oldSelected.removeClass('dropdown__item--selected');
+    $newSelected.addClass('dropdown__item--selected');
   };
 
   $.fn.mentioner = function (settings) {

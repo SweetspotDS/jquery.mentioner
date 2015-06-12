@@ -1,0 +1,45 @@
+.mentioner {
+  position: relative; }
+
+.mentioner__dropdown {
+  border-width: 1px;
+  position: absolute;
+  border-color: black;
+  border-style: solid; }
+  .mentioner__dropdown--hidden {
+    display: none; }
+
+.dropdown {
+  margin: 0;
+  padding: 0;
+  background-color: white;
+  list-style-type: none; }
+
+.dropdown__item {
+  display: table;
+  table-layout: fixed;
+  width: 100%;
+  cursor: pointer; }
+
+.dropdown__item:hover, .dropdown__item--selected {
+  background-color: #ECECEC; }
+
+.dropdown__item__name, .dropdown__item__avatar {
+  display: table-cell;
+  vertical-align: middle; }
+
+.dropdown__item__name {
+  margin: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 80%; }
+
+.dropdown__item__avatar {
+  width: 20%; }
+
+.dropdown__item__avatar__image {
+  vertical-align: middle;
+  width: 100%; }
+
+/*# sourceMappingURL=jquery.mentioner.css.map */

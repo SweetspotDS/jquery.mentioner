@@ -11,29 +11,32 @@
   };
 
   var MENTIONER_HOOK_CLASSES = {
+    ROOT: 'js-mentioner-root',
     WRAPPER: 'js-mentioner-wrapper',
     DROPDOWN: 'js-mentioner-dropdown',
     DROPDOWN_ITEM: 'js-mentioner-dropdown-item'
   };
 
   var Mentioner = function($root, settings) {
-    this.$root = $root;
     this.mentionSymbol = settings.mentionSymbol || '@';
     this.matcher = settings.matcher || $.noop;
     this.mentionables = (settings.requester ? settings.requester() : []).sort(function(prev, next){
       return prev.name.localeCompare(next.name);
     });
 
-    this.buildDOM();
+    this.buildDOM($root);
     this.attachEvents();
   };
 
-  Mentioner.prototype.buildDOM = function() {
+  Mentioner.prototype.buildDOM = function($root) {
     var $parent = $( '<div class="' + MENTIONER_HOOK_CLASSES.WRAPPER + ' mentioner"></div>' );
-    this.$root.wrap($parent);
+    $root.wrap($parent);
+
+    var $contentEditable = $( '<div class="' + MENTIONER_HOOK_CLASSES.ROOT + ' mentioner__composer" contenteditable="true"></div>' );
+    $root.replaceWith($contentEditable);
 
     var $dropdown = $( '<ul class="' + MENTIONER_HOOK_CLASSES.DROPDOWN + ' mentioner__dropdown mentioner__dropdown--hidden dropdown"></ul>' );
-    this.getParentWrapper().append($dropdown);
+    this.$parentWrapper().append($dropdown);
   };
 
   Mentioner.prototype.attachEvents = function() {
@@ -43,8 +46,9 @@
      *
      * Related bug: https://github.com/ariya/phantomjs/issues/10522
      */
-    this.$root.on('keydown', this.onRootKeydown());
-    this.$root.on('input', this.onRootInput());
+    this.$root().on('keydown', this.onRootKeydown());
+    this.$root().on('input', this.onRootInput());
+    this.$root().on('paste', this.onRootPaste());
   };
 
   Mentioner.prototype.onRootKeydown = function() {
@@ -79,7 +83,6 @@
           });
         break;
         case KEYS.RETURN:
-          // TODO It should take the selected dropdown option if the dropdown is displayed.
           dropdownEventWrapper($.noop);
         break;
         default:
@@ -91,8 +94,9 @@
   Mentioner.prototype.onRootInput = function() {
     var that = this;
 
-    return function() {
-      var text = that.$root.val();
+    return function(event) {
+      event.preventDefault();
+      var text = that.$root().text();
       var lastMentionSymbolIndex = text.lastIndexOf(that.mentionSymbol);
 
       if(that.canBeSearchable(text, lastMentionSymbolIndex)) {
@@ -101,6 +105,22 @@
       } else {
         that.hideDropdown();
       }
+    };
+  };
+
+  Mentioner.prototype.onRootPaste = function() {
+    var that = this;
+
+    return function(event) {
+      event.preventDefault();
+
+      var pastedData = event.originalEvent.clipboardData.getData('text/plain');
+
+      var sanetizedHtml = pastedData.split("\n").map(function(line) {
+        return line.trim() === "" ? '<div></div>' : '<div>' + line + '</div>';
+      }).join('');
+
+      that.addContentToRootHtml(sanetizedHtml);
     };
   };
 
@@ -141,12 +161,23 @@
     }
   };
 
-  Mentioner.prototype.getParentWrapper = function() {
-    return this.$root.parent();
+  Mentioner.prototype.$root = function() {
+    return $( '.' + MENTIONER_HOOK_CLASSES.ROOT );
+  };
+
+  Mentioner.prototype.$parentWrapper = function() {
+    return this.$root().parent();
+  };
+
+  Mentioner.prototype.addContentToRootHtml = function(html) {
+    var oldRootHtml = this.$root().html();
+    var newRootText = oldRootHtml + html;
+
+    this.$root().html(newRootText);
   };
 
   Mentioner.prototype.getDropdown = function() {
-    return this.getParentWrapper().find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN);
+    return this.$parentWrapper().find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN);
   };
 
   Mentioner.prototype.getDropdownOptions = function() {
@@ -228,10 +259,9 @@
   };
 
   Mentioner.prototype.getStyleForDropdown = function() {
-    var top = this.$root.outerHeight() - 3;
-    var width = this.$root.innerWidth();
+    var top = this.$root().outerHeight() - 3;
 
-    return 'top: ' + top + 'px; width: ' + width + 'px;';
+    return 'top: ' + top + 'px;';
   };
 
   Mentioner.prototype.hideDropdown = function() {

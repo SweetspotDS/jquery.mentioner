@@ -16,29 +16,30 @@
   };
 
   var MENTIONER_HOOK_CLASSES = {
-    ROOT: 'js-mentioner-root',
     WRAPPER: 'js-mentioner-wrapper',
     DROPDOWN: 'js-mentioner-dropdown',
     DROPDOWN_ITEM: 'js-mentioner-dropdown-item'
   };
 
   var Mentioner = function($root, settings) {
+    this.$root = $root;
+
+    this.editor = settings.editor;
     this.mentionSymbol = settings.mentionSymbol || '@';
     this.matcher = settings.matcher || $.noop;
     this.mentionables = (settings.requester ? settings.requester() : []).sort(function(prev, next){
       return prev.name.localeCompare(next.name);
     });
 
-    this.buildDOM($root);
+    this.buildDOM();
     this.attachEvents();
   };
 
-  Mentioner.prototype.buildDOM = function($root) {
+  Mentioner.prototype.buildDOM = function() {
     var $parent = $( '<div class="' + MENTIONER_HOOK_CLASSES.WRAPPER + ' mentioner"></div>' );
-    $root.wrap($parent);
+    this.$root.wrap($parent);
 
-    var $contentEditable = $( '<div class="' + MENTIONER_HOOK_CLASSES.ROOT + ' mentioner__composer" contenteditable="true"></div>' );
-    $root.replaceWith($contentEditable);
+    this.$root.addClass('mentioner__composer');
 
     var $dropdown = $( '<ul class="' + MENTIONER_HOOK_CLASSES.DROPDOWN + ' mentioner__dropdown mentioner__dropdown--hidden dropdown"></ul>' );
     this.$parentWrapper().append($dropdown);
@@ -51,9 +52,8 @@
      *
      * Related bug: https://github.com/ariya/phantomjs/issues/10522
      */
-    this.$root().on('keydown', this.onRootKeydown());
-    this.$root().on('input', this.onRootInput());
-    this.$root().on('paste', this.onRootPaste());
+    this.$root.on('keydown', this.onRootKeydown());
+    this.editor.subscribe('editableInput', this.onEditableInput());
   };
 
   Mentioner.prototype.onRootKeydown = function() {
@@ -96,12 +96,11 @@
     };
   };
 
-  Mentioner.prototype.onRootInput = function() {
+  Mentioner.prototype.onEditableInput = function() {
     var that = this;
 
-    return function(event) {
-      event.preventDefault();
-      var text = that.$root().text();
+    return function() {
+      var text = that.getRootText();
       var lastMentionSymbolIndex = text.lastIndexOf(that.mentionSymbol);
 
       if(that.canBeSearchable(text, lastMentionSymbolIndex)) {
@@ -113,20 +112,12 @@
     };
   };
 
-  Mentioner.prototype.onRootPaste = function() {
-    var that = this;
+  Mentioner.prototype.getRootText = function() {
+    var paragraphs = this.$root.find('p');
 
-    return function(event) {
-      event.preventDefault();
-
-      var pastedData = event.originalEvent.clipboardData.getData('text/plain');
-
-      var sanetizedHtml = pastedData.split("\n").map(function(line) {
-        return line.trim() === "" ? '<div></div>' : '<div>' + line + '</div>';
-      }).join('');
-
-      that.addContentToRootHtml(sanetizedHtml);
-    };
+    return $.makeArray(paragraphs).map(function(p) {
+      return $(p).text();
+    }).join('\n');
   };
 
   Mentioner.prototype.canBeSearchable = function(text, lastMentionSymbolIndex) {
@@ -166,19 +157,8 @@
     }
   };
 
-  Mentioner.prototype.$root = function() {
-    return $( '.' + MENTIONER_HOOK_CLASSES.ROOT );
-  };
-
   Mentioner.prototype.$parentWrapper = function() {
-    return this.$root().parent();
-  };
-
-  Mentioner.prototype.addContentToRootHtml = function(html) {
-    var oldRootHtml = this.$root().html();
-    var newRootText = oldRootHtml + html;
-
-    this.$root().html(newRootText);
+    return this.$root.parent();
   };
 
   Mentioner.prototype.getDropdown = function() {
@@ -264,7 +244,7 @@
   };
 
   Mentioner.prototype.getStyleForDropdown = function() {
-    var top = this.$root().outerHeight() - 3;
+    var top = this.$root.outerHeight() - 3;
 
     return 'top: ' + top + 'px;';
   };

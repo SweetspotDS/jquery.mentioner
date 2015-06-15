@@ -52,9 +52,10 @@
      *
      * Related bug: https://github.com/ariya/phantomjs/issues/10522
      */
-    this.$root.on('keydown', this.onRootKeydown());
     this.$root.on('blur', this.onRootBlur());
+    this.$root.on('keydown', this.onRootKeydown());
     this.editor.subscribe('editableInput', this.onEditableInput());
+    this.$dropdown().on('mousedown', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemMousedown());
   };
 
   Mentioner.prototype.onRootKeydown = function() {
@@ -121,6 +122,15 @@
     };
   };
 
+  Mentioner.prototype.onDropdownItemMousedown = function() {
+    var that = this;
+
+    return function(event) {
+      event.preventDefault();
+      that.hideDropdown();
+    };
+  };
+
   Mentioner.prototype.getRootText = function() {
     var paragraphs = this.$root.find('p');
 
@@ -154,15 +164,26 @@
 
   Mentioner.prototype.search = function(query) {
     var that = this;
-
-    var candidates = this.mentionables.filter(function(mentionable) {
-      return that.matcher.call(that, mentionable, query);
+    var sanitizedQuery = that.cleanEntities(query);
+    var candidates = that.mentionables.filter(function(mentionable) {
+      return that.matcher.call(that, mentionable, sanitizedQuery);
     });
 
     if(candidates.length > 0) {
-      this.showDropdown(candidates);
+      that.showDropdown(candidates);
     } else {
-      this.hideDropdown();
+      that.hideDropdown();
+    }
+  };
+
+  Mentioner.prototype.cleanEntities = function(query) {
+    // Cleaning &nbps;
+    var nonBreakableSpaceIndex = query.indexOf(String.fromCharCode(160));
+
+    if(nonBreakableSpaceIndex > -1) {
+      return query.slice(0, nonBreakableSpaceIndex) + ' ' + query.slice(nonBreakableSpaceIndex + 1);
+    } else {
+      return query;
     }
   };
 
@@ -170,18 +191,18 @@
     return this.$root.parent();
   };
 
-  Mentioner.prototype.getDropdown = function() {
+  Mentioner.prototype.$dropdown = function() {
     return this.$parentWrapper().find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN);
   };
 
   Mentioner.prototype.getDropdownOptions = function() {
-    return this.getDropdown().find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM);
+    return this.$dropdown().find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM);
   };
 
   Mentioner.prototype.showDropdown = function(candidates) {
     var $dropdownOptionsToAppend = this.getDropdownOptionsToAppend(candidates);
 
-    var $dropdown = this.getDropdown();
+    var $dropdown = this.$dropdown();
     $dropdown.append($dropdownOptionsToAppend);
     $dropdown.attr('style', this.getStyleForDropdown());
     $dropdown.removeClass('mentioner__dropdown--hidden');
@@ -259,12 +280,12 @@
   };
 
   Mentioner.prototype.hideDropdown = function() {
-    var $dropdown = this.getDropdown();
+    var $dropdown = this.$dropdown();
     $dropdown.addClass('mentioner__dropdown--hidden');
   };
 
   Mentioner.prototype.isDropdownDisplayed = function() {
-    return !this.getDropdown().hasClass('mentioner__dropdown--hidden');
+    return !this.$dropdown().hasClass('mentioner__dropdown--hidden');
   };
 
   Mentioner.prototype.selectOtherDropdownOption = function(getter) {

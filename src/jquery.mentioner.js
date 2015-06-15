@@ -39,7 +39,7 @@
     var $parent = $( '<div class="' + MENTIONER_HOOK_CLASSES.WRAPPER + ' mentioner"></div>' );
     this.$root.wrap($parent);
 
-    this.$root.addClass('mentioner__composer');
+    this.$root.addClass('mentioner__composer composer');
 
     var $dropdown = $( '<ul class="' + MENTIONER_HOOK_CLASSES.DROPDOWN + ' mentioner__dropdown mentioner__dropdown--hidden dropdown"></ul>' );
     this.$parentWrapper().append($dropdown);
@@ -244,7 +244,7 @@
   };
 
   Mentioner.prototype.getStyleForDropdown = function() {
-    var top = this.$root.outerHeight() - 3;
+    var top = this.$root.outerHeight() + 5;
 
     return 'top: ' + top + 'px;';
   };

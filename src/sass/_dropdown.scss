@@ -3,11 +3,14 @@
   padding: 0;
 
   background-color: white;
+  border-radius: 3px;
+  box-shadow: 0px 0px 5px #ADADAD;
   list-style-type: none;
 }
 
 .dropdown__item {
   display: table;
+  padding: 10px 0;
   table-layout: fixed;
   width: 100%;
 
@@ -34,20 +37,24 @@
 .dropdown__item__name {
   @extend %dropdown__item__cell;
 
+  font-size: 13px;
+
+  font-family: sans-serif;
   margin: 0;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 80%;
+  width: 75%;
 }
 
 .dropdown__item__avatar {
   @extend %dropdown__item__cell;
-
-  width: 20%;
+  padding: 0 10px;
+  width: calc(25% - 20px);
 }
 
 .dropdown__item__avatar__image {
+  border-radius: 50%;
   vertical-align: middle;
   width: 100%;
 }

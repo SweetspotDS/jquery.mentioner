@@ -1,9 +1,18 @@
+$composer-font-size: 13px;
+
 .composer {
-  font-size: 13px;
+  font-size: $composer-font-size;
 
   font-family: sans-serif;
 
   p {
     margin: 0;
   }
+}
+
+.composer__mention {
+  background-color: #DADADA;
+  border: 0;
+  font-size: $composer-font-size;
+  padding: 0 3px;
 }

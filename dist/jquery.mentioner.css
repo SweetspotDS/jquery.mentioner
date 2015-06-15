@@ -59,4 +59,10 @@
   .composer p {
     margin: 0; }
 
+.composer__mention {
+  background-color: #DADADA;
+  border: 0;
+  font-size: 13px;
+  padding: 0 3px; }
+
 /*# sourceMappingURL=jquery.mentioner.css.map */

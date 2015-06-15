@@ -22,7 +22,8 @@
       $(document).ready(function() {
         var editor = new MediumEditor('.js-composer', {
           placeholder: false,
-          disableToolbar: true
+          disableToolbar: true,
+          disableDoubleReturn: true
         });
         var $composer = $( '.js-composer' );
 

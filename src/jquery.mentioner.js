@@ -90,7 +90,9 @@
           });
         break;
         case KEYS.RETURN:
-          dropdownEventWrapper($.noop);
+          dropdownEventWrapper(function() {
+            this.getSelectedDropdownOption().trigger('mousedown');
+          });
         break;
         default:
           return true;
@@ -127,6 +129,19 @@
 
     return function(event) {
       event.preventDefault();
+
+      var mentionable = $(this).data('mentionable');
+      var currentSelection = that.editor.exportSelection();
+      var previousText = that.getRootText().slice(0, currentSelection.end);
+      var lastMentionSymbolIndex = previousText.lastIndexOf(that.mentionSymbol);
+
+      that.editor.importSelection({
+        start: lastMentionSymbolIndex,
+        end: currentSelection.end
+      });
+
+      that.editor.pasteHTML('<input type="text" style="font-family:monospace;" value="' + mentionable.name + '" size="' + mentionable.name.length + '" readonly/>');
+
       that.hideDropdown();
     };
   };

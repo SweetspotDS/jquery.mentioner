@@ -53,6 +53,7 @@
      * Related bug: https://github.com/ariya/phantomjs/issues/10522
      */
     this.$root.on('keydown', this.onRootKeydown());
+    this.$root.on('blur', this.onRootBlur());
     this.editor.subscribe('editableInput', this.onEditableInput());
   };
 
@@ -93,6 +94,14 @@
         default:
           return true;
       }
+    };
+  };
+
+  Mentioner.prototype.onRootBlur = function() {
+    var that = this;
+
+    return function() {
+      that.hideDropdown();
     };
   };
 

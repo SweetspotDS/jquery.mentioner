@@ -38,19 +38,20 @@
   @extend %dropdown__item__cell;
 
   font-size: 13px;
-
-  font-family: sans-serif;
   margin: 0;
   overflow: hidden;
+  width: 80%;
+
+  font-family: sans-serif;
   text-overflow: ellipsis;
   white-space: nowrap;
-  width: 75%;
 }
 
 .dropdown__item__avatar {
   @extend %dropdown__item__cell;
+
   padding: 0 10px;
-  width: calc(25% - 20px);
+  width: calc(20% - 20px);
 }
 
 .dropdown__item__avatar__image {

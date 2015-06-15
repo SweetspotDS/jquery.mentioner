@@ -1,7 +1,9 @@
 {
   "name": "jquerymentioner",
   "version": "0.0.1",
-  "dependencies": {},
+  "dependencies": {
+    "medium-editor": "~4.12.3"
+  },
   "devDependencies": {
     "jquery": "~1.9",
     "mocha": "~2.2.5",

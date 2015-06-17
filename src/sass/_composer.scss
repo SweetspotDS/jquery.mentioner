@@ -2,6 +2,7 @@ $composer-font-size: 13px;
 
 .composer {
   font-size: $composer-font-size;
+  min-height: $composer-font-size;
 
   font-family: sans-serif;
 

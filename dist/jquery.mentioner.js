@@ -126,14 +126,11 @@
       event.preventDefault();
 
       var mentionable = $(this).data('mentionable');
-      var currentSelection = that.editor.exportSelection();
-      var previousText = that.getRootText().trim().slice(0, currentSelection.end);
-      var lastMentionSymbolIndex = previousText.lastIndexOf(that.mentionSymbol);
       var inputWidth = that.getWidthForInput(mentionable.name);
-      var html = '<input value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention" disabled="disabled"></input>';
+      var html = '<input value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" disabled="disabled" />&nbsp;';
 
-      that.editor.importSelection({ start: lastMentionSymbolIndex, end: currentSelection.end });
       that.editor.pasteHTML(html, { cleanAttrs: [] });
+      
       that.hideDropdown();
     };
   };
@@ -150,8 +147,19 @@
   Mentioner.prototype.getRootText = function() {
     var paragraphs = this.$root.find('p');
 
-    return $.makeArray(paragraphs).map(function(p) {
-      return $(p).text();
+    var lines = $.makeArray(paragraphs).map(function(p) {
+      var $clon = $(p).clone();
+      var $mentions = $clon.find('.js-mention');
+
+      $mentions.replaceWith(function() {
+        return '@[' + $(this).val() + ']()';
+      });
+
+      return $clon.children().remove().end().text();
+    });
+
+    return lines.filter(function(line) {
+      return line !== '';
     }).join('\n');
   };
 
@@ -193,7 +201,7 @@
   };
 
   Mentioner.prototype.cleanEntities = function(query) {
-    // Cleaning &nbps;
+    // Cleaning &nbsp;
     var nonBreakableSpaceIndex = query.indexOf(String.fromCharCode(160));
 
     if(nonBreakableSpaceIndex > -1) {

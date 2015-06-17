@@ -55,6 +55,7 @@
 
 .composer {
   font-size: 13px;
+  min-height: 13px;
   font-family: sans-serif; }
   .composer p {
     margin: 0; }
@@ -63,6 +64,9 @@
   background-color: #DADADA;
   border: 0;
   font-size: 13px;
-  padding: 0 3px; }
+  line-height: 1.4;
+  padding: 0 3px;
+  color: #000;
+  font-family: sans-serif; }
 
 /*# sourceMappingURL=jquery.mentioner.css.map */

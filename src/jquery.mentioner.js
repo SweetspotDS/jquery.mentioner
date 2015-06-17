@@ -61,7 +61,7 @@
   Mentioner.prototype.onRootKeydown = function() {
     var that = this;
 
-    var dropdownEventWrapper = function(callback) {
+    var dropdownEventWrapper = function(event, callback) {
       if(that.isDropdownDisplayed()) {
         event.preventDefault();
         callback.call(that);
@@ -71,26 +71,26 @@
     return function(event) {
       switch (event.keyCode) {
         case KEYS.ESC:
-          dropdownEventWrapper(function() {
+          dropdownEventWrapper(event, function() {
             this.hideDropdown();
           });
-          break;
+        break;
         case KEYS.DOWN:
-          dropdownEventWrapper(function() {
+          dropdownEventWrapper(event, function() {
             this.selectOtherDropdownOption(function($selected) {
               return $selected.next().length === 0 ? $selected.siblings().first() : $selected.next();
             });
           });
         break;
         case KEYS.UP:
-          dropdownEventWrapper(function() {
+          dropdownEventWrapper(event, function() {
             this.selectOtherDropdownOption(function($selected) {
               return $selected.prev().length === 0 ? $selected.siblings().last() : $selected.prev();
             });
           });
         break;
         case KEYS.RETURN:
-          dropdownEventWrapper(function() {
+          dropdownEventWrapper(event, function() {
             this.getSelectedDropdownOption().trigger('mousedown');
           });
         break;
@@ -132,18 +132,24 @@
 
       var mentionable = $(this).data('mentionable');
       var currentSelection = that.editor.exportSelection();
-      var previousText = that.getRootText().slice(0, currentSelection.end);
+      var previousText = that.getRootText().trim().slice(0, currentSelection.end);
       var lastMentionSymbolIndex = previousText.lastIndexOf(that.mentionSymbol);
+      var inputWidth = that.getWidthForInput(mentionable.name);
+      var html = '<input value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention" disabled="disabled"></input>';
 
-      that.editor.importSelection({
-        start: lastMentionSymbolIndex,
-        end: currentSelection.end
-      });
-
-      that.editor.pasteHTML('<input type="text" style="font-family:monospace;" value="' + mentionable.name + '" size="' + mentionable.name.length + '" readonly/>');
-
+      that.editor.importSelection({ start: lastMentionSymbolIndex, end: currentSelection.end });
+      that.editor.pasteHTML(html, { cleanAttrs: [] });
       that.hideDropdown();
     };
+  };
+
+  Mentioner.prototype.getWidthForInput = function(text) {
+    var $span = $('<span></span>').text(text);
+    this.$root.append($span);
+    var width = $span.width();
+    $span.remove();
+
+    return width;
   };
 
   Mentioner.prototype.getRootText = function() {
@@ -174,7 +180,7 @@
   };
 
   Mentioner.prototype.isValidPostMentionSymbolChar = function(postMentionSymbolChar) {
-    return postMentionSymbolChar !== " ";
+    return postMentionSymbolChar !== ' ';
   };
 
   Mentioner.prototype.search = function(query) {
@@ -264,7 +270,7 @@
       '<div class="dropdown__item__avatar">',
         '<img class="dropdown__item__avatar__image" src="' + mentionable.avatar + '" />',
       '</div>'
-    ].join("\n"));
+    ].join('\n'));
 
     $item.append($avatar);
     $item.append($name);
@@ -289,7 +295,7 @@
   };
 
   Mentioner.prototype.getStyleForDropdown = function() {
-    var top = this.$root.outerHeight() + 5;
+    var top = this.$root.outerHeight() + 10;
 
     return 'top: ' + top + 'px;';
   };

@@ -132,10 +132,10 @@
 
       var mentionable = $(this).data('mentionable');
       var inputWidth = that.getWidthForInput(mentionable.name);
-      var html = '<input value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" disabled="disabled" />&nbsp;';
+      var html = '<input value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" disabled="disabled" />';
 
-      that.editor.pasteHTML(html, { cleanAttrs: [] });
-      
+      that.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
+
       that.hideDropdown();
     };
   };

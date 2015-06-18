@@ -52,52 +52,13 @@
      *
      * Related bug: https://github.com/ariya/phantomjs/issues/10522
      */
-    this.$root.on('blur', this.onRootBlur());
-    this.$root.on('keydown', this.onRootKeydown());
+    this.editor.subscribe('editableBlur', this.onRootBlur());
     this.editor.subscribe('editableInput', this.onEditableInput());
+    this.editor.subscribe('editableKeyup', this.onEditableKeyup());
+    this.editor.subscribe('editableKeydown', this.onRootKeydown());
+    this.editor.subscribe('editableKeydownEnter', this.onRootKeydownEnter());
+
     this.$dropdown().on('mousedown', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemMousedown());
-  };
-
-  Mentioner.prototype.onRootKeydown = function() {
-    var that = this;
-
-    var dropdownEventWrapper = function(event, callback) {
-      if(that.isDropdownDisplayed()) {
-        event.preventDefault();
-        callback.call(that);
-      }
-    };
-
-    return function(event) {
-      switch (event.keyCode) {
-        case KEYS.ESC:
-          dropdownEventWrapper(event, function() {
-            this.hideDropdown();
-          });
-        break;
-        case KEYS.DOWN:
-          dropdownEventWrapper(event, function() {
-            this.selectOtherDropdownOption(function($selected) {
-              return $selected.next().length === 0 ? $selected.siblings().first() : $selected.next();
-            });
-          });
-        break;
-        case KEYS.UP:
-          dropdownEventWrapper(event, function() {
-            this.selectOtherDropdownOption(function($selected) {
-              return $selected.prev().length === 0 ? $selected.siblings().last() : $selected.prev();
-            });
-          });
-        break;
-        case KEYS.RETURN:
-          dropdownEventWrapper(event, function() {
-            this.getSelectedDropdownOption().trigger('mousedown');
-          });
-        break;
-        default:
-          return true;
-      }
-    };
   };
 
   Mentioner.prototype.onRootBlur = function() {
@@ -121,6 +82,64 @@
       } else {
         that.hideDropdown();
       }
+    };
+  };
+
+  Mentioner.prototype.dropdownEventWrapper = function(event, callback) {
+    if(this.isDropdownDisplayed()) {
+      event.preventDefault();
+
+      callback.call(this);
+    }
+  };
+
+  Mentioner.prototype.onEditableKeyup = function() {
+    var that = this;
+
+    return function(event) {
+      if(event.keyCode === KEYS.RETURN) {
+        that.dropdownEventWrapper(event, function() {
+          this.getSelectedDropdownOption().trigger('mousedown');
+        });
+      }
+    };
+  };
+
+  Mentioner.prototype.onRootKeydown = function() {
+    var that = this;
+
+    return function(event) {
+      switch (event.keyCode) {
+        case KEYS.ESC:
+          that.dropdownEventWrapper(event, function() {
+            this.hideDropdown();
+          });
+        break;
+        case KEYS.DOWN:
+          that.dropdownEventWrapper(event, function() {
+            this.selectOtherDropdownOption(function($selected) {
+              return $selected.next().length === 0 ? $selected.siblings().first() : $selected.next();
+            });
+          });
+        break;
+        case KEYS.UP:
+          that.dropdownEventWrapper(event, function() {
+            this.selectOtherDropdownOption(function($selected) {
+              return $selected.prev().length === 0 ? $selected.siblings().last() : $selected.prev();
+            });
+          });
+        break;
+        default:
+          return true;
+      }
+    };
+  };
+
+  Mentioner.prototype.onRootKeydownEnter = function() {
+    var that = this;
+
+    return function(event) {
+      that.dropdownEventWrapper(event, $.noop);
     };
   };
 
@@ -238,6 +257,9 @@
 
     this.removeOrphanDropdownOptions(candidates);
     this.checkSelectedDropdownOption();
+
+    var $selected = this.getSelectedDropdownOption();
+    $selected.find
   };
 
   Mentioner.prototype.getDropdownOptionsToAppend = function(candidates) {
@@ -299,7 +321,7 @@
   };
 
   Mentioner.prototype.getSelectedDropdownOption = function() {
-    return $( '.dropdown__item--selected' );
+    return this.$dropdown().find('.dropdown__item--selected');
   };
 
   Mentioner.prototype.getStyleForDropdown = function() {

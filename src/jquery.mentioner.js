@@ -257,9 +257,6 @@
 
     this.removeOrphanDropdownOptions(candidates);
     this.checkSelectedDropdownOption();
-
-    var $selected = this.getSelectedDropdownOption();
-    $selected.find
   };
 
   Mentioner.prototype.getDropdownOptionsToAppend = function(candidates) {

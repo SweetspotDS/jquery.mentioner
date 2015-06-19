@@ -197,7 +197,11 @@
     var preMentionText = text.slice(0, selection.end);
     var currentMentionSymbolIndex = preMentionText.lastIndexOf(this.mentionSymbol);
     var mentionTextTrigger = preMentionText.slice(currentMentionSymbolIndex, selection.end);
-    var sanetizedMentionTextTrigger = this.clearEntities(mentionTextTrigger, '&nbsp;');
+    var sanetizedMentionTextTrigger = this.clearEntities(mentionTextTrigger, {
+      "160": function(index, query) {
+        return query.length > 1 ? this.replaceAt(query, index, '&nbsp;') : '&nbsp;';
+      }
+    });
     var regex = new RegExp('(' + sanetizedMentionTextTrigger + ')(<input)');
     var normalized = this.$root.html().replace(regex, function(match, p1, p2) { return p2; });
 
@@ -219,14 +223,7 @@
     var paragraphs = this.$root.find('p');
 
     var lines = $.makeArray(paragraphs).map(function(p) {
-      var $clon = $(p).clone();
-      var $mentions = $clon.find('.js-mention');
-
-      $mentions.replaceWith(function() {
-        return '@[' + $(this).val() + ']()';
-      });
-
-      return $clon.children().remove().end().text();
+      return $(p).clone().children().remove().end().text();
     });
 
     return lines.filter(function(line) {
@@ -254,7 +251,7 @@
   };
 
   Mentioner.prototype.isValidPostMentionSymbolChar = function(postMentionSymbolChar) {
-    return postMentionSymbolChar !== ' ';
+    return true;
   };
 
   Mentioner.prototype.search = function(query) {
@@ -271,15 +268,33 @@
     }
   };
 
-  Mentioner.prototype.clearEntities = function(query, replacement) {
-    // Cleaning &nbsp;
-    var nonBreakableSpaceIndex = query.indexOf(String.fromCharCode(160));
+  Mentioner.prototype.replaceAt = function (string, index, replacement) {
+    return string.slice(0, index) + replacement + string.slice(index + 1);
+  };
 
-    if(nonBreakableSpaceIndex > -1) {
-      return query.slice(0, nonBreakableSpaceIndex) + (replacement || ' ') + query.slice(nonBreakableSpaceIndex + 1);
-    } else {
-      return query;
+  Mentioner.prototype.clearEntities = function(query, customReplacements) {
+    var replacements = $.extend({}, {
+      "160": function(index, query) {
+        return query.length > 1 ? this.replaceAt(query, index, ' ')  : ' ';
+      },
+      "10": function(index, query) {
+        return query.slice(0, index);
+      }
+    }, customReplacements);
+
+    var result = query;
+
+    for(var code in replacements) {
+      var replacement = replacements[code];
+      var charCode = String.fromCharCode(parseInt(code));
+      var entityIndex = result.indexOf(charCode);
+
+      if(entityIndex > -1) {
+        result = replacement.call(this, entityIndex, result);
+      }
     }
+
+    return result;
   };
 
   Mentioner.prototype.$parentWrapper = function() {

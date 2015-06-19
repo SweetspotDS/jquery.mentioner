@@ -73,6 +73,8 @@
     var that = this;
 
     return function() {
+      that.normalizeRootHTML();
+
       var text = that.getRootText();
       var lastMentionSymbolIndex = text.lastIndexOf(that.mentionSymbol);
 
@@ -83,6 +85,19 @@
         that.hideDropdown();
       }
     };
+  };
+
+  Mentioner.prototype.normalizeRootHTML = function () {
+    var paragraphs = this.$root.find('p');
+    var text = this.$root.text();
+
+    if(paragraphs.length === 0 && text !== '') {
+      var selection = this.editor.exportSelection();
+      var $p = $( '<p>' + text + '</p>' );
+
+      this.$root.html($p);
+      this.editor.importSelection(selection);
+    }
   };
 
   Mentioner.prototype.dropdownEventWrapper = function(event, callback) {
@@ -152,13 +167,24 @@
       var mentionable = $(this).data('mentionable');
       var inputId = new Date().getTime();
       var inputWidth = that.getWidthForInput(mentionable.name);
-      var html = '<input id="' + inputId + '" value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" disabled="disabled" />';
+      var html = '<input id="' + inputId + '" value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" readonly />';
 
       that.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
+
+      var selection = that.editor.exportSelection();
+      var removed = that.clearMentionTextTrigger(selection);
       that.addBlankAfterMention(inputId);
-      that.clearMentionTextTrigger();
+      that.recalculateSelection(selection, removed);
+
       that.hideDropdown();
     };
+  };
+
+  Mentioner.prototype.recalculateSelection = function(oldSelection, removedText) {
+    var blankLength = 1;
+    var newSelectionPosition = oldSelection.end - removedText.length + blankLength;
+
+    this.editor.importSelection({ start: newSelectionPosition, end: newSelectionPosition });
   };
 
   Mentioner.prototype.addBlankAfterMention = function(id) {
@@ -171,18 +197,18 @@
     $blank.replaceWith('&nbsp;');
   };
 
-  Mentioner.prototype.clearMentionTextTrigger = function() {
-    var selection = this.editor.exportSelection();
+  Mentioner.prototype.clearMentionTextTrigger = function(selection) {
     var text = this.$root.text();
     var preMentionText = text.slice(0, selection.end);
     var currentMentionSymbolIndex = preMentionText.lastIndexOf(this.mentionSymbol);
     var mentionTextTrigger = preMentionText.slice(currentMentionSymbolIndex, selection.end);
-    var normalized = this.$root.html().replace(mentionTextTrigger, '');
-    // Where it was before, minus the text that we have removed and adding the blank after the mention input
-    var newSelectionPosition = selection.end - mentionTextTrigger.length + 1;
+    var sanetizedMentionTextTrigger = this.clearEntities(mentionTextTrigger, '&nbsp;');
+    var regex = new RegExp('(' + sanetizedMentionTextTrigger + ')(<input)');
+    var normalized = this.$root.html().replace(regex, function(match, p1, p2) { return p2; });
 
     this.$root.html(normalized);
-    this.editor.importSelection({ start: newSelectionPosition, end: newSelectionPosition });
+
+    return mentionTextTrigger;
   };
 
   Mentioner.prototype.getWidthForInput = function(text) {
@@ -250,12 +276,12 @@
     }
   };
 
-  Mentioner.prototype.clearEntities = function(query) {
+  Mentioner.prototype.clearEntities = function(query, replacement) {
     // Cleaning &nbsp;
     var nonBreakableSpaceIndex = query.indexOf(String.fromCharCode(160));
 
     if(nonBreakableSpaceIndex > -1) {
-      return query.slice(0, nonBreakableSpaceIndex) + ' ' + query.slice(nonBreakableSpaceIndex + 1);
+      return query.slice(0, nonBreakableSpaceIndex) + (replacement || ' ') + query.slice(nonBreakableSpaceIndex + 1);
     } else {
       return query;
     }

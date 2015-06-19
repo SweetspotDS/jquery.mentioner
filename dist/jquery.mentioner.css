@@ -45,8 +45,7 @@
   white-space: nowrap; }
 
 .dropdown__item__avatar {
-  padding: 0 10px;
-  width: calc(20% - 20px); }
+  padding: 0 10px; }
 
 .dropdown__item__avatar__image {
   border-radius: 50%;

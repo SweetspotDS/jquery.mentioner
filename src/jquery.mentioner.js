@@ -150,17 +150,43 @@
       event.preventDefault();
 
       var mentionable = $(this).data('mentionable');
+      var inputId = new Date().getTime();
       var inputWidth = that.getWidthForInput(mentionable.name);
-      var html = '<input value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" disabled="disabled" />';
+      var html = '<input id="' + inputId + '" value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" disabled="disabled" />';
 
       that.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
-
+      that.addBlankAfterMention(inputId);
+      that.clearMentionTextTrigger();
       that.hideDropdown();
     };
   };
 
+  Mentioner.prototype.addBlankAfterMention = function(id) {
+    var $mention = this.$root.find('#' + id);
+    var $blank = $( '<span>&nbsp;</span>' );
+
+    $blank.insertAfter($mention);
+
+    // We cannot mantain the <span> tag for preserving the editor HTML structure
+    $blank.replaceWith('&nbsp;');
+  };
+
+  Mentioner.prototype.clearMentionTextTrigger = function() {
+    var selection = this.editor.exportSelection();
+    var text = this.$root.text();
+    var preMentionText = text.slice(0, selection.end);
+    var currentMentionSymbolIndex = preMentionText.lastIndexOf(this.mentionSymbol);
+    var mentionTextTrigger = preMentionText.slice(currentMentionSymbolIndex, selection.end);
+    var normalized = this.$root.html().replace(mentionTextTrigger, '');
+    // Where it was before, minus the text that we have removed and adding the blank after the mention input
+    var newSelectionPosition = selection.end - mentionTextTrigger.length + 1;
+
+    this.$root.html(normalized);
+    this.editor.importSelection({ start: newSelectionPosition, end: newSelectionPosition });
+  };
+
   Mentioner.prototype.getWidthForInput = function(text) {
-    var $span = $('<span></span>').text(text);
+    var $span = $('<span style="visibility: hidden;"></span>').text(text);
     this.$root.append($span);
     var width = $span.width();
     $span.remove();
@@ -212,7 +238,7 @@
 
   Mentioner.prototype.search = function(query) {
     var that = this;
-    var sanitizedQuery = that.cleanEntities(query);
+    var sanitizedQuery = that.clearEntities(query);
     var candidates = that.mentionables.filter(function(mentionable) {
       return that.matcher.call(that, mentionable, sanitizedQuery);
     });
@@ -224,7 +250,7 @@
     }
   };
 
-  Mentioner.prototype.cleanEntities = function(query) {
+  Mentioner.prototype.clearEntities = function(query) {
     // Cleaning &nbsp;
     var nonBreakableSpaceIndex = query.indexOf(String.fromCharCode(160));
 

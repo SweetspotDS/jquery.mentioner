@@ -1,4 +1,4 @@
-/*! jquery.mentioner - v0.0.1 - 2015-06-18
+/*! jquery.mentioner - v0.0.1 - 2015-06-19
 * Copyright (c) 2015 MediaSQ; Licensed MIT */
 (function ($) {
   'use strict';
@@ -47,52 +47,13 @@
      *
      * Related bug: https://github.com/ariya/phantomjs/issues/10522
      */
-    this.$root.on('blur', this.onRootBlur());
-    this.$root.on('keydown', this.onRootKeydown());
+    this.editor.subscribe('editableBlur', this.onRootBlur());
     this.editor.subscribe('editableInput', this.onEditableInput());
+    this.editor.subscribe('editableKeyup', this.onEditableKeyup());
+    this.editor.subscribe('editableKeydown', this.onRootKeydown());
+    this.editor.subscribe('editableKeydownEnter', this.onRootKeydownEnter());
+
     this.$dropdown().on('mousedown', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemMousedown());
-  };
-
-  Mentioner.prototype.onRootKeydown = function() {
-    var that = this;
-
-    var dropdownEventWrapper = function(event, callback) {
-      if(that.isDropdownDisplayed()) {
-        event.preventDefault();
-        callback.call(that);
-      }
-    };
-
-    return function(event) {
-      switch (event.keyCode) {
-        case KEYS.ESC:
-          dropdownEventWrapper(event, function() {
-            this.hideDropdown();
-          });
-        break;
-        case KEYS.DOWN:
-          dropdownEventWrapper(event, function() {
-            this.selectOtherDropdownOption(function($selected) {
-              return $selected.next().length === 0 ? $selected.siblings().first() : $selected.next();
-            });
-          });
-        break;
-        case KEYS.UP:
-          dropdownEventWrapper(event, function() {
-            this.selectOtherDropdownOption(function($selected) {
-              return $selected.prev().length === 0 ? $selected.siblings().last() : $selected.prev();
-            });
-          });
-        break;
-        case KEYS.RETURN:
-          dropdownEventWrapper(event, function() {
-            this.getSelectedDropdownOption().trigger('mousedown');
-          });
-        break;
-        default:
-          return true;
-      }
-    };
   };
 
   Mentioner.prototype.onRootBlur = function() {
@@ -119,6 +80,64 @@
     };
   };
 
+  Mentioner.prototype.dropdownEventWrapper = function(event, callback) {
+    if(this.isDropdownDisplayed()) {
+      event.preventDefault();
+
+      callback.call(this);
+    }
+  };
+
+  Mentioner.prototype.onEditableKeyup = function() {
+    var that = this;
+
+    return function(event) {
+      if(event.keyCode === KEYS.RETURN) {
+        that.dropdownEventWrapper(event, function() {
+          this.getSelectedDropdownOption().trigger('mousedown');
+        });
+      }
+    };
+  };
+
+  Mentioner.prototype.onRootKeydown = function() {
+    var that = this;
+
+    return function(event) {
+      switch (event.keyCode) {
+        case KEYS.ESC:
+          that.dropdownEventWrapper(event, function() {
+            this.hideDropdown();
+          });
+        break;
+        case KEYS.DOWN:
+          that.dropdownEventWrapper(event, function() {
+            this.selectOtherDropdownOption(function($selected) {
+              return $selected.next().length === 0 ? $selected.siblings().first() : $selected.next();
+            });
+          });
+        break;
+        case KEYS.UP:
+          that.dropdownEventWrapper(event, function() {
+            this.selectOtherDropdownOption(function($selected) {
+              return $selected.prev().length === 0 ? $selected.siblings().last() : $selected.prev();
+            });
+          });
+        break;
+        default:
+          return true;
+      }
+    };
+  };
+
+  Mentioner.prototype.onRootKeydownEnter = function() {
+    var that = this;
+
+    return function(event) {
+      that.dropdownEventWrapper(event, $.noop);
+    };
+  };
+
   Mentioner.prototype.onDropdownItemMousedown = function() {
     var that = this;
 
@@ -126,17 +145,43 @@
       event.preventDefault();
 
       var mentionable = $(this).data('mentionable');
+      var inputId = new Date().getTime();
       var inputWidth = that.getWidthForInput(mentionable.name);
-      var html = '<input value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" disabled="disabled" />';
+      var html = '<input id="' + inputId + '" value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" disabled="disabled" />';
 
       that.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
-
+      that.addBlankAfterMention(inputId);
+      that.clearMentionTextTrigger();
       that.hideDropdown();
     };
   };
 
+  Mentioner.prototype.addBlankAfterMention = function(id) {
+    var $mention = this.$root.find('#' + id);
+    var $blank = $( '<span>&nbsp;</span>' );
+
+    $blank.insertAfter($mention);
+
+    // We cannot mantain the <span> tag for preserving the editor HTML structure
+    $blank.replaceWith('&nbsp;');
+  };
+
+  Mentioner.prototype.clearMentionTextTrigger = function() {
+    var selection = this.editor.exportSelection();
+    var text = this.$root.text();
+    var preMentionText = text.slice(0, selection.end);
+    var currentMentionSymbolIndex = preMentionText.lastIndexOf(this.mentionSymbol);
+    var mentionTextTrigger = preMentionText.slice(currentMentionSymbolIndex, selection.end);
+    var normalized = this.$root.html().replace(mentionTextTrigger, '');
+    // Where it was before, minus the text that we have removed and adding the blank after the mention input
+    var newSelectionPosition = selection.end - mentionTextTrigger.length + 1;
+
+    this.$root.html(normalized);
+    this.editor.importSelection({ start: newSelectionPosition, end: newSelectionPosition });
+  };
+
   Mentioner.prototype.getWidthForInput = function(text) {
-    var $span = $('<span></span>').text(text);
+    var $span = $('<span style="visibility: hidden;"></span>').text(text);
     this.$root.append($span);
     var width = $span.width();
     $span.remove();
@@ -188,7 +233,7 @@
 
   Mentioner.prototype.search = function(query) {
     var that = this;
-    var sanitizedQuery = that.cleanEntities(query);
+    var sanitizedQuery = that.clearEntities(query);
     var candidates = that.mentionables.filter(function(mentionable) {
       return that.matcher.call(that, mentionable, sanitizedQuery);
     });
@@ -200,7 +245,7 @@
     }
   };
 
-  Mentioner.prototype.cleanEntities = function(query) {
+  Mentioner.prototype.clearEntities = function(query) {
     // Cleaning &nbsp;
     var nonBreakableSpaceIndex = query.indexOf(String.fromCharCode(160));
 
@@ -294,7 +339,7 @@
   };
 
   Mentioner.prototype.getSelectedDropdownOption = function() {
-    return $( '.dropdown__item--selected' );
+    return this.$dropdown().find('.dropdown__item--selected');
   };
 
   Mentioner.prototype.getStyleForDropdown = function() {

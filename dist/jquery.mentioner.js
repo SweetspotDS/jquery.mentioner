@@ -1,4 +1,4 @@
-/*! jquery.mentioner - v0.0.1 - 2015-06-19
+/*! jquery.mentioner - v0.0.1 - 2015-06-22
 * Copyright (c) 2015 MediaSQ; Licensed MIT */
 (function ($) {
   'use strict';
@@ -19,6 +19,7 @@
   var Mentioner = function($root, settings) {
     this.$root = $root;
 
+    this.lastKeyDown = null;
     this.editor = settings.editor;
     this.mentionSymbol = settings.mentionSymbol || '@';
     this.matcher = settings.matcher || $.noop;
@@ -68,31 +69,18 @@
     var that = this;
 
     return function() {
-      that.normalizeRootHTML();
+      var text = that.$root.text();
+      var selection = that.editor.exportSelection();
+      var preSelectionText = text.slice(0, selection.end);
+      var lastMentionSymbolIndex = preSelectionText.lastIndexOf(that.mentionSymbol);
 
-      var text = that.getRootText();
-      var lastMentionSymbolIndex = text.lastIndexOf(that.mentionSymbol);
-
-      if(that.canBeSearchable(text, lastMentionSymbolIndex)) {
-        var query = text.slice(lastMentionSymbolIndex + 1);
+      if(lastMentionSymbolIndex > -1 && that.lastKeyDown !== KEYS.RETURN) {
+        var query = preSelectionText.slice(lastMentionSymbolIndex + 1);
         that.search(query);
       } else {
         that.hideDropdown();
       }
     };
-  };
-
-  Mentioner.prototype.normalizeRootHTML = function () {
-    var paragraphs = this.$root.find('p');
-    var text = this.$root.text();
-
-    if(paragraphs.length === 0 && text !== '') {
-      var selection = this.editor.exportSelection();
-      var $p = $( '<p>' + text + '</p>' );
-
-      this.$root.html($p);
-      this.editor.importSelection(selection);
-    }
   };
 
   Mentioner.prototype.dropdownEventWrapper = function(event, callback) {
@@ -119,6 +107,8 @@
     var that = this;
 
     return function(event) {
+      that.lastKeyDown = event.keyCode;
+
       switch (event.keyCode) {
         case KEYS.ESC:
           that.dropdownEventWrapper(event, function() {
@@ -217,41 +207,6 @@
     $span.remove();
 
     return width;
-  };
-
-  Mentioner.prototype.getRootText = function() {
-    var paragraphs = this.$root.find('p');
-
-    var lines = $.makeArray(paragraphs).map(function(p) {
-      return $(p).clone().children().remove().end().text();
-    });
-
-    return lines.filter(function(line) {
-      return line !== '';
-    }).join('\n');
-  };
-
-  Mentioner.prototype.canBeSearchable = function(text, lastMentionSymbolIndex) {
-    if(lastMentionSymbolIndex === -1) {
-      return false;
-    }
-
-    var preMentionSymbolChar = text.charAt(lastMentionSymbolIndex - 1);
-    var postMentionSymbolChar = text.charAt(lastMentionSymbolIndex  + 1);
-    var isValidPreMentionSymbolChar = this.isValidPreMentionSymbolChar(preMentionSymbolChar);
-    var isValidPostMentionSymbolChar = this.isValidPostMentionSymbolChar(postMentionSymbolChar);
-
-    return isValidPreMentionSymbolChar && isValidPostMentionSymbolChar;
-  };
-
-  Mentioner.prototype.isValidPreMentionSymbolChar = function(preMentionSymbolChar) {
-    // Prevent the dropdown to be shown when typing the mention symbol
-    // after alphanumeric characters
-    return !(/\w/g).test(preMentionSymbolChar);
-  };
-
-  Mentioner.prototype.isValidPostMentionSymbolChar = function(postMentionSymbolChar) {
-    return true;
   };
 
   Mentioner.prototype.search = function(query) {

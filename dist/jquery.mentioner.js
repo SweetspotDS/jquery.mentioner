@@ -21,6 +21,8 @@
 
     this.lastKeyDown = null;
     this.editor = settings.editor;
+    this.minQueryLength = settings.minQueryLength || 1;
+    this.maxMentionablesToShow = settings.maxMentionablesToShow || 5;
     this.mentionSymbol = settings.mentionSymbol || '@';
     this.matcher = settings.matcher || $.noop;
     this.mentionables = (settings.requester ? settings.requester() : []).sort(function(prev, next){
@@ -73,9 +75,9 @@
       var selection = that.editor.exportSelection();
       var preSelectionText = text.slice(0, selection.end);
       var lastMentionSymbolIndex = preSelectionText.lastIndexOf(that.mentionSymbol);
+      var query = preSelectionText.slice(lastMentionSymbolIndex + 1);
 
-      if(lastMentionSymbolIndex > -1 && that.lastKeyDown !== KEYS.RETURN) {
-        var query = preSelectionText.slice(lastMentionSymbolIndex + 1);
+      if(lastMentionSymbolIndex > -1 && that.lastKeyDown !== KEYS.RETURN && query.length >= that.minQueryLength) {
         that.search(query);
       } else {
         that.hideDropdown();
@@ -214,7 +216,7 @@
     var sanitizedQuery = that.clearEntities(query);
     var candidates = that.mentionables.filter(function(mentionable) {
       return that.matcher.call(that, mentionable, sanitizedQuery);
-    });
+    }).slice(0, that.maxMentionablesToShow);
 
     if(candidates.length > 0) {
       that.showDropdown(candidates);
@@ -340,8 +342,10 @@
 
   Mentioner.prototype.getStyleForDropdown = function() {
     var top = this.$root.outerHeight() + 10;
+    var rootPaddingLeft = this.$root.css('padding-left');
+    var left = this.$root.offset().left - parseInt(rootPaddingLeft);
 
-    return 'top: ' + top + 'px;';
+    return 'top: ' + top + 'px; left: ' + left + 'px;';
   };
 
   Mentioner.prototype.hideDropdown = function() {

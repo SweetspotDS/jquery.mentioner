@@ -4,19 +4,39 @@
     <link href="../bower_components/medium-editor/dist/css/medium-editor.css" rel="stylesheet" type="text/css">
     <link href="../dist/jquery.mentioner.css" rel="stylesheet" type="text/css">
 
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+
     <title>Examples for jquery.mentioner</title>
     <script src="../bower_components/medium-editor/dist/js/medium-editor.js"></script>
     <script src="../bower_components/jquery/jquery.js"></script>
     <script src="../dist/jquery.mentioner.js"></script>
 
     <style media="screen">
+      body {
+        font-family: 'Lato', sans-serif;
+      }
+
+      .title {
+        color: #fc3952;
+        font-size: 48px;
+        font-weight: 300;
+        text-align: center;
+      }
+
       .composer {
+        margin: 0 auto;
         width: 400px;
       }
     </style>
   </head>
   <body>
-    <div class="js-composer"></div>
+    <header>
+      <h1 class="title">jquery.mentioner</h1>
+    </header>
+
+    <section>
+      <div class="js-composer"></div>
+    </section>
 
     <script type="text/javascript">
       $(document).ready(function() {
@@ -44,6 +64,46 @@
                 name: 'Tyrion Lannister',
                 avatar: 'https://gp4.googleusercontent.com/-hBCcPT52DQk/AAAAAAAAAAI/AAAAAAAAAAA/22zJFbXDK6I/s48-c-k-no/photo.jpg?sz=50',
                 id: 2
+              },
+              {
+                name: 'Cersei Lannister',
+                avatar: 'https://lh5.googleusercontent.com/-n5QJb1oEA1E/AAAAAAAAAAI/AAAAAAAAABI/jaoli3bi0oo/photo.jpg?sz=50',
+                id: 3
+              },
+              {
+                name: 'Jaime Lannister',
+                avatar: 'https://pbs.twimg.com/profile_images/2258491879/jaime-lannister-160_normal.jpg',
+                id: 4
+              },
+              {
+                name: 'Sansa Stark',
+                avatar: 'https://lh4.googleusercontent.com/-dUPMKG9P87E/AAAAAAAAAAI/AAAAAAAAdjI/sx0mvfffwR8/photo.jpg?sz=50',
+                id: 5
+              },
+              {
+                name: 'Arya Stark',
+                avatar: 'http://cheatsheetworld.com/img/entertainment/game-of-thrones/game-of-thrones-arya-stark.jpg',
+                id: 6
+              },
+              {
+                name: 'Petyr Baelish',
+                avatar: 'https://pbs.twimg.com/profile_images/3523397119/465d65e7d353a4353fa0e0ef9e2f9948.png',
+                id: 7
+              },
+              {
+                name: 'Hodor',
+                avatar: 'https://lh4.googleusercontent.com/-vAOo9SxCZhI/AAAAAAAAAAI/AAAAAAAAByE/cNWt8OM10g0/photo.jpg?sz=50',
+                id: 8
+              },
+              {
+                name: 'Theon Greyjoy',
+                avatar: 'https://pbs.twimg.com/profile_images/2219229967/theon_normal.jpg',
+                id: 9
+              },
+              {
+                name: 'Melisandre',
+                avatar: 'http://cdn.images.express.co.uk/img/dynamic/galleries/64x64/55658.jpg',
+                id: 10
               }
             ];
           },

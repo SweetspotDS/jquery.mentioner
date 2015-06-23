@@ -364,7 +364,7 @@
 
   Mentioner.prototype.selectOtherDropdownOption = function(getter) {
     var $oldSelected = this.getSelectedDropdownOption();
-    var $newSelected = getter.call(this, $oldSelected);
+    var $newSelected = $oldSelected.siblings().length === 0 ? $oldSelected : getter.call(this, $oldSelected);
     this.selectDropdownOption($oldSelected, $newSelected);
   };
 

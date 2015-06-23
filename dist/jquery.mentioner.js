@@ -1,4 +1,4 @@
-/*! jquery.mentioner - v0.0.1 - 2015-06-22
+/*! jquery.mentioner - v0.0.1 - 2015-06-23
 * Copyright (c) 2015 MediaSQ; Licensed MIT */
 (function ($) {
   'use strict';
@@ -359,7 +359,7 @@
 
   Mentioner.prototype.selectOtherDropdownOption = function(getter) {
     var $oldSelected = this.getSelectedDropdownOption();
-    var $newSelected = getter.call(this, $oldSelected);
+    var $newSelected = $oldSelected.siblings().length === 0 ? $oldSelected : getter.call(this, $oldSelected);
     this.selectDropdownOption($oldSelected, $newSelected);
   };
 

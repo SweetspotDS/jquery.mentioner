@@ -49,45 +49,31 @@
   };
 
   Mentioner.prototype.attachEvents = function() {
-    /*
-     * Not using Function.prototype.bind because of incompatibilities
-     * with PhantomJS
-     *
-     * Related bug: https://github.com/ariya/phantomjs/issues/10522
-     */
-    this.editor.subscribe('editableBlur', this.onRootBlur());
-    this.editor.subscribe('editableInput', this.onEditableInput());
-    this.editor.subscribe('editableKeyup', this.onEditableKeyup());
-    this.editor.subscribe('editableKeydown', this.onRootKeydown());
-    this.editor.subscribe('editableKeydownEnter', this.onRootKeydownEnter());
+    this.editor.subscribe('editableBlur', this.onRootBlur.bind(this));
+    this.editor.subscribe('editableInput', this.onEditableInput.bind(this));
+    this.editor.subscribe('editableKeyup', this.onEditableKeyup.bind(this));
+    this.editor.subscribe('editableKeydown', this.onRootKeydown.bind(this));
+    this.editor.subscribe('editableKeydownEnter', this.onRootKeydownEnter.bind(this));
 
     this.$dropdown().on('mousedown', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemMousedown());
   };
 
   Mentioner.prototype.onRootBlur = function() {
-    var that = this;
-
-    return function() {
-      that.hideDropdown();
-    };
+    this.hideDropdown();
   };
 
   Mentioner.prototype.onEditableInput = function() {
-    var that = this;
+    var text = this.$root.text();
+    var selection = this.editor.exportSelection();
+    var preSelectionText = text.slice(0, selection.end);
+    var lastMentionSymbolIndex = preSelectionText.lastIndexOf(this.mentionSymbol);
+    var query = preSelectionText.slice(lastMentionSymbolIndex + 1);
 
-    return function() {
-      var text = that.$root.text();
-      var selection = that.editor.exportSelection();
-      var preSelectionText = text.slice(0, selection.end);
-      var lastMentionSymbolIndex = preSelectionText.lastIndexOf(that.mentionSymbol);
-      var query = preSelectionText.slice(lastMentionSymbolIndex + 1);
-
-      if(lastMentionSymbolIndex > -1 && that.lastKeyDown !== KEYS.RETURN && query.length >= that.minQueryLength) {
-        that.search(query);
-      } else {
-        that.hideDropdown();
-      }
-    };
+    if(lastMentionSymbolIndex > -1 && this.lastKeyDown !== KEYS.RETURN && query.length >= this.minQueryLength) {
+      this.search(query);
+    } else {
+      this.hideDropdown();
+    }
   };
 
   Mentioner.prototype.dropdownEventWrapper = function(event, callback) {
@@ -98,56 +84,44 @@
     }
   };
 
-  Mentioner.prototype.onEditableKeyup = function() {
-    var that = this;
+  Mentioner.prototype.onEditableKeyup = function(event) {
+    if(event.keyCode === KEYS.RETURN) {
+      this.dropdownEventWrapper(event, function() {
+        this.getSelectedDropdownOption().trigger('mousedown');
+      });
+    }
+  };
 
-    return function(event) {
-      if(event.keyCode === KEYS.RETURN) {
-        that.dropdownEventWrapper(event, function() {
-          this.getSelectedDropdownOption().trigger('mousedown');
+  Mentioner.prototype.onRootKeydown = function(event) {
+    this.lastKeyDown = event.keyCode;
+
+    switch (event.keyCode) {
+      case KEYS.ESC:
+        this.dropdownEventWrapper(event, function() {
+          this.hideDropdown();
         });
-      }
-    };
+      break;
+      case KEYS.DOWN:
+        this.dropdownEventWrapper(event, function() {
+          this.selectOtherDropdownOption(function($selected) {
+            return $selected.next().length === 0 ? $selected.siblings().first() : $selected.next();
+          });
+        });
+      break;
+      case KEYS.UP:
+        this.dropdownEventWrapper(event, function() {
+          this.selectOtherDropdownOption(function($selected) {
+            return $selected.prev().length === 0 ? $selected.siblings().last() : $selected.prev();
+          });
+        });
+      break;
+      default:
+        return true;
+    }
   };
 
-  Mentioner.prototype.onRootKeydown = function() {
-    var that = this;
-
-    return function(event) {
-      that.lastKeyDown = event.keyCode;
-
-      switch (event.keyCode) {
-        case KEYS.ESC:
-          that.dropdownEventWrapper(event, function() {
-            this.hideDropdown();
-          });
-        break;
-        case KEYS.DOWN:
-          that.dropdownEventWrapper(event, function() {
-            this.selectOtherDropdownOption(function($selected) {
-              return $selected.next().length === 0 ? $selected.siblings().first() : $selected.next();
-            });
-          });
-        break;
-        case KEYS.UP:
-          that.dropdownEventWrapper(event, function() {
-            this.selectOtherDropdownOption(function($selected) {
-              return $selected.prev().length === 0 ? $selected.siblings().last() : $selected.prev();
-            });
-          });
-        break;
-        default:
-          return true;
-      }
-    };
-  };
-
-  Mentioner.prototype.onRootKeydownEnter = function() {
-    var that = this;
-
-    return function(event) {
-      that.dropdownEventWrapper(event, $.noop);
-    };
+  Mentioner.prototype.onRootKeydownEnter = function(event) {
+    this.dropdownEventWrapper(event, $.noop);
   };
 
   Mentioner.prototype.onDropdownItemMousedown = function() {

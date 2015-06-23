@@ -47,6 +47,10 @@
   white-space: nowrap;
 }
 
+.dropdown__item__name__highlight {
+  text-decoration: underline;  
+}
+
 .dropdown__item__avatar {
   @extend %dropdown__item__cell;
 

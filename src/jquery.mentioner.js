@@ -198,7 +198,7 @@
     }).slice(0, that.maxMentionablesToShow);
 
     if(candidates.length > 0) {
-      that.showDropdown(candidates);
+      that.showDropdown(candidates, sanitizedQuery);
     } else {
       that.hideDropdown();
     }
@@ -245,7 +245,7 @@
     return this.$dropdown().find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM);
   };
 
-  Mentioner.prototype.showDropdown = function(candidates) {
+  Mentioner.prototype.showDropdown = function(candidates, query) {
     var $dropdownOptionsToAppend = this.getDropdownOptionsToAppend(candidates);
 
     var $dropdown = this.$dropdown();
@@ -253,6 +253,7 @@
     $dropdown.attr('style', this.getStyleForDropdown());
     $dropdown.removeClass('mentioner__dropdown--hidden');
 
+    this.highlightDropdownOptions($dropdownOptionsToAppend, query);
     this.removeOrphanDropdownOptions(candidates);
     this.checkSelectedDropdownOption();
   };
@@ -267,10 +268,25 @@
       });
 
       if($relatedDropdownOption.length !== 0) {
+        var mentionable = $relatedDropdownOption.data('mentionable');
+        $relatedDropdownOption.find('p').html(mentionable.name);
+
         return $relatedDropdownOption;
       } else {
         return that.createDropdownOption(candidate);
       }
+    });
+  };
+
+  Mentioner.prototype.highlightDropdownOptions = function ($elements, query) {
+    $elements.forEach(function($el) {
+      var $p = $el.find('p');
+      var currentHtml = $p.html();
+      var queryIndex = currentHtml.toLowerCase().indexOf(query.toLowerCase());
+      var result = currentHtml.slice(queryIndex, queryIndex + query.length);
+      var html = currentHtml.replace(result, '<span class="dropdown__item__name__highlight">' + result + '</span>');
+
+      $p.html(html);
     });
   };
 

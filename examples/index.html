@@ -106,22 +106,6 @@
                 id: 10
               }
             ];
-          },
-          matcher: function(mentionable, query) {
-            var regex = new RegExp('^' + query.toLowerCase());
-            var hasMatch = false;
-
-            var mentionableName = mentionable.name.toLowerCase();
-            var candidates = [mentionableName];
-            candidates.push.apply(candidates, mentionableName.split(' '));
-
-            candidates.forEach(function(candidate) {
-              if(regex.test(candidate)) {
-                hasMatch = true;
-              }
-            });
-
-            return hasMatch;
           }
         });
       });

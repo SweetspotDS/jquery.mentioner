@@ -29,13 +29,30 @@
     this.minQueryLength = settings.minQueryLength || 1;
     this.maxMentionablesToShow = settings.maxMentionablesToShow || 5;
     this.mentionSymbol = settings.mentionSymbol || '@';
-    this.matcher = settings.matcher || $.noop;
+    this.matcher = settings.matcher || this.defaultMatcher;
     this.mentionables = (settings.requester ? settings.requester() : []).sort(function(prev, next){
       return prev.name.localeCompare(next.name);
     });
 
     this.buildDOM();
     this.attachEvents();
+  };
+
+  Mentioner.prototype.defaultMatcher = function (mentionable, query) {
+    var regex = new RegExp('^' + query.toLowerCase());
+    var hasMatch = false;
+
+    var mentionableName = mentionable.name.toLowerCase();
+    var candidates = [mentionableName];
+    candidates.push.apply(candidates, mentionableName.split(' '));
+
+    candidates.forEach(function(candidate) {
+      if(regex.test(candidate)) {
+        hasMatch = true;
+      }
+    });
+
+    return hasMatch;
   };
 
   Mentioner.prototype.buildDOM = function() {
@@ -268,8 +285,7 @@
       });
 
       if($relatedDropdownOption.length !== 0) {
-        var mentionable = $relatedDropdownOption.data('mentionable');
-        $relatedDropdownOption.find('p').html(mentionable.name);
+        $relatedDropdownOption.find('p').html(candidate.name);
 
         return $relatedDropdownOption;
       } else {

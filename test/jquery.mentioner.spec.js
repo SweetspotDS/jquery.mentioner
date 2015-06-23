@@ -1,17 +1,22 @@
 (function ($) {
   describe('jQuery#mentioner', function() {
-    var elems;
+    var editor, elems;
 
     beforeEach(function() {
-      elems = $('.js-textareas-collection').children();
+      editor = new MediumEditor('.js-editor-1', {
+        placeholder: false,
+        disableToolbar: true
+      });
+
+      elems = $('.js-editors').children();
     });
 
     it('is chainable', function () {
-      elems.mentioner().should.equal(elems);
+      elems.mentioner({ editor: editor }).should.equal(elems);
     });
 
     it('has a mentioner object attached', function() {
-      elems.mentioner().each(function() {
+      elems.mentioner({ editor: editor }).each(function() {
         $(this).data('mentioner').should.exist;
       });
     });

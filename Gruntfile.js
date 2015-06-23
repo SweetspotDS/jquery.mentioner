@@ -37,15 +37,6 @@ module.exports = function (grunt) {
         dest: 'dist/<%= pkg.name %>.min.js'
       }
     },
-    mocha: {
-      test: {
-        src: ['test/<%= pkg.name %>.html'],
-        options: {
-          log: true,
-          run: true
-        }
-      }
-    },
     jshint: {
       options: {
         reporter: require('jshint-stylish')
@@ -80,11 +71,11 @@ module.exports = function (grunt) {
       },
       src: {
         files: '<%= jshint.src.src %>',
-        tasks: ['jshint:src', 'mocha', 'concat']
+        tasks: ['jshint:src', 'concat']
       },
       test: {
         files: '<%= jshint.test.src %>',
-        tasks: ['jshint:test', 'mocha']
+        tasks: ['jshint:test']
       }
     },
     connect: {
@@ -110,11 +101,10 @@ module.exports = function (grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', ['jshint', 'connect', 'mocha', 'clean', 'concat', 'sass', 'uglify']);
+  grunt.registerTask('default', ['jshint', 'connect', 'clean', 'concat', 'sass', 'uglify']);
   grunt.registerTask('server', function () {
     grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
     grunt.task.run(['serve']);
   });
   grunt.registerTask('serve', ['connect', 'watch']);
-  grunt.registerTask('test', ['jshint', 'mocha']);
 };

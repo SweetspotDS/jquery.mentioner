@@ -180,6 +180,41 @@
 
       });
 
+      describe('Working with the public API', function() {
+        before(function() {
+          $editor.empty();
+          $editor.focus();
+        });
+
+        describe('#getMentions', function() {
+
+          it('returns an empty array when there aren\'t any inserted mentions', function() {
+            var mentions = $editor.mentioner('getMentions');
+            mentions.should.eql([]);
+          });
+
+          it('returns the collection of inserted mentions', function() {
+            medium.cleanPaste('@J');
+            medium.trigger('editableKeyup', $.Event('keyup', { keyCode: 13 }), $editor);
+
+            var mentions = $editor.mentioner('getMentions');
+            mentions.length.should.equal(1);
+          });
+
+        });
+
+        describe('#serialize', function() {
+
+          it('serializes the content of the editor and returns its HTML', function() {
+            medium.cleanPaste('serialize me!');
+            var html = $editor.mentioner('serialize');
+            var expectedHtml = $editor.html();
+
+            html.should.equal(expectedHtml);
+          });
+
+        });
+      });
     });
   });
 }(jQuery));

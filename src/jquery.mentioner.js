@@ -150,7 +150,7 @@
       var mentionable = $(this).data('mentionable');
       var inputId = new Date().getTime();
       var inputWidth = that.getWidthForInput(mentionable.name);
-      var html = '<input id="' + inputId + '" value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" readonly />';
+      var html = '<input id="' + inputId + '" data-mentionable-id="' + mentionable.id + '" value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" readonly />';
 
       that.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
 
@@ -379,20 +379,50 @@
     $newSelected.addClass('dropdown__item--selected');
   };
 
+  Mentioner.prototype.serialize = function() {
+    return this.$root.html();
+  };
+
+  Mentioner.prototype.getMentions = function () {
+    var that = this;
+    var $mentions = that.$root.find('input');
+
+    return $.makeArray($mentions).map(function(mention) {
+      var id = $(mention).data('mentionableId');
+      var mentionables = that.mentionables.filter(function(mentionable) {
+        return mentionable.id === id;
+      });
+
+      // We are comparing by id, so we assume that we only have one result
+      return mentionables[0];
+    });
+  };
+
   var Api = function($root, settings) {
     this.mentioner = new Mentioner($root, settings);
   };
 
+  Api.prototype.serialize = function () {
+    return this.mentioner.serialize();
+  };
 
-  $.fn.mentioner = function (settings) {
-    settings = settings || {};
+  Api.prototype.getMentions = function () {
+    return this.mentioner.getMentions();
+  };
 
-    return this.each(function () {
-      var $subject = $( this );
-
-      if($subject.data('mentioner') === undefined) {
-        $subject.data('mentioner', new Api($subject, settings));
+  $.fn.mentioner = function (options) {
+    if(typeof options === 'object') {
+      return this.each(function () {
+        var $subject = $( this );
+        if($subject.data('mentioner') === undefined) {
+          $subject.data('mentioner', new Api($subject, options));
+        }
+      });
+    } else if(typeof options === 'string') {
+      var instance = $( this ).data('mentioner');
+      if(instance && typeof instance[options] === 'function') {
+        return instance[options]();
       }
-    });
+    }
   };
 }(jQuery));

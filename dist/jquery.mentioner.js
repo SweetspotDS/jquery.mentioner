@@ -145,7 +145,8 @@
       var mentionable = $(this).data('mentionable');
       var inputId = new Date().getTime();
       var inputWidth = that.getWidthForInput(mentionable.name);
-      var html = '<input id="' + inputId + '" data-mentionable-id="' + mentionable.id + '" value="' + mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" readonly />';
+      var html = '<input id="' + inputId + '" data-mentionable-id="' + mentionable.id + '" value="' +
+        mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" readonly />';
 
       that.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
 

@@ -19,7 +19,7 @@
       });
     });
 
-    it('has a Api instance attached', function() {
+    it('has an Api instance attached', function() {
       $editor.data('mentioner').should.exist;
     });
 

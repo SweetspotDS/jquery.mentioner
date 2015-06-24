@@ -379,6 +379,11 @@
     $newSelected.addClass('dropdown__item--selected');
   };
 
+  var Api = function($root, settings) {
+    this.mentioner = new Mentioner($root, settings);
+  };
+
+
   $.fn.mentioner = function (settings) {
     settings = settings || {};
 
@@ -386,7 +391,7 @@
       var $subject = $( this );
 
       if($subject.data('mentioner') === undefined) {
-        $subject.data('mentioner', new Mentioner($subject, settings));
+        $subject.data('mentioner', new Api($subject, settings));
       }
     });
   };

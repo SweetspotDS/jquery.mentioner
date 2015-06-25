@@ -62,9 +62,9 @@
     var $parent = $( '<div class="' + MENTIONER_HOOK_CLASSES.WRAPPER + ' mentioner"></div>' );
     this.$root.wrap($parent);
 
-    this.$root.addClass('mentioner__composer composer');
+    this.$root.addClass('mentioner__composer');
 
-    var $dropdown = $( '<ul class="' + MENTIONER_HOOK_CLASSES.DROPDOWN + ' mentioner__dropdown mentioner__dropdown--hidden dropdown"></ul>' );
+    var $dropdown = $( '<ul class="' + MENTIONER_HOOK_CLASSES.DROPDOWN + ' mentioner__dropdown mentioner__dropdown--hidden"></ul>' );
     this.$parentWrapper().append($dropdown);
   };
 
@@ -154,7 +154,7 @@
       var inputId = new Date().getTime();
       var inputWidth = that.getWidthForInput(mentionable.name);
       var html = '<input id="' + inputId + '" data-mentionable-id="' + mentionable.id + '" value="' +
-        mentionable.name + '" style="width:' + inputWidth + 'px;" class="composer__mention js-mention" readonly />';
+        mentionable.name + '" style="width:' + inputWidth + 'px;" class="mentioner__composer__mention js-mention" readonly />';
 
       that.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
 
@@ -292,7 +292,7 @@
       var currentHtml = $p.html();
       var queryIndex = currentHtml.toLowerCase().indexOf(query.toLowerCase());
       var result = currentHtml.slice(queryIndex, queryIndex + query.length);
-      var html = currentHtml.replace(result, '<span class="dropdown__item__name__highlight">' + result + '</span>');
+      var html = currentHtml.replace(result, '<span class="mentioner__dropdown__item__name__highlight">' + result + '</span>');
 
       $p.html(html);
     });
@@ -313,11 +313,11 @@
   };
 
   Mentioner.prototype.createDropdownOption = function(mentionable) {
-    var $item = $( '<li class="' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM + ' dropdown__item"></li>' );
-    var $name = $( '<p class="dropdown__item__name">' + mentionable.name + '</p>' );
+    var $item = $( '<li class="' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM + ' mentioner__dropdown__item"></li>' );
+    var $name = $( '<p class="mentioner__dropdown__item__name">' + mentionable.name + '</p>' );
     var $avatar = $([
-      '<div class="dropdown__item__avatar">',
-        '<img class="dropdown__item__avatar__image" src="' + mentionable.avatar + '" />',
+      '<div class="mentioner__dropdown__item__avatar">',
+        '<img class="mentioner__dropdown__item__avatar__image" src="' + mentionable.avatar + '" />',
       '</div>'
     ].join('\n'));
 
@@ -340,7 +340,7 @@
   };
 
   Mentioner.prototype.getSelectedDropdownOption = function() {
-    return this.$dropdown().find('.dropdown__item--selected');
+    return this.$dropdown().find('.mentioner__dropdown__item--selected');
   };
 
   Mentioner.prototype.getStyleForDropdown = function() {
@@ -366,8 +366,8 @@
   };
 
   Mentioner.prototype.selectDropdownOption = function($oldSelected, $newSelected) {
-    $oldSelected.removeClass('dropdown__item--selected');
-    $newSelected.addClass('dropdown__item--selected');
+    $oldSelected.removeClass('mentioner__dropdown__item--selected');
+    $newSelected.addClass('mentioner__dropdown__item--selected');
   };
 
   Mentioner.prototype.serialize = function() {

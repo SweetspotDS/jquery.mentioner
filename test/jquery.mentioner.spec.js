@@ -51,13 +51,13 @@
       });
 
       it('adds the selected class to the first candidate', function() {
-        $candidates.first().hasClass('dropdown__item--selected').should.be.true;
+        $candidates.first().hasClass('mentioner__dropdown__item--selected').should.be.true;
       });
 
       it('highlights the part of the candidate\'s name that matches the query', function() {
         $candidates.each(function() {
           var $p = $(this).find('p');
-          var highlight = '<span class="dropdown__item__name__highlight">S</span>';
+          var highlight = '<span class="mentioner__dropdown__item__name__highlight">S</span>';
           var index = $p.html().indexOf(highlight);
 
           index.should.not.equal(-1);
@@ -77,7 +77,7 @@
           medium.trigger('editableKeydown', event, $editor);
 
           var $dropdownItems = $( '.js-mentioner-dropdown-item' );
-          $dropdownItems.last().hasClass('dropdown__item--selected').should.be.true;
+          $dropdownItems.last().hasClass('mentioner__dropdown__item--selected').should.be.true;
         });
 
         it('goes to the top when there are not any next sibling', function() {
@@ -88,7 +88,7 @@
           medium.trigger('editableKeydown', event, $editor);
 
           var $dropdownItems = $( '.js-mentioner-dropdown-item' );
-          $dropdownItems.first().hasClass('dropdown__item--selected').should.be.true;
+          $dropdownItems.first().hasClass('mentioner__dropdown__item--selected').should.be.true;
         });
 
         it('goes down successfully when it has a next sibling', function() {
@@ -99,7 +99,7 @@
           medium.trigger('editableKeydown', event, $editor);
 
           var $dropdownItems = $( '.js-mentioner-dropdown-item' );
-          $dropdownItems.first().next().hasClass('dropdown__item--selected').should.be.true;
+          $dropdownItems.first().next().hasClass('mentioner__dropdown__item--selected').should.be.true;
         });
 
         it('goes up successfully when it has a prev sibling', function() {
@@ -110,7 +110,7 @@
           medium.trigger('editableKeydown', event, $editor);
 
           var $dropdownItems = $( '.js-mentioner-dropdown-item' );
-          $dropdownItems.first().hasClass('dropdown__item--selected').should.be.true;
+          $dropdownItems.first().hasClass('mentioner__dropdown__item--selected').should.be.true;
         });
 
         it('inserts the selected option when keyup the RETURN key', function() {
@@ -118,7 +118,7 @@
             keyCode: 13 // RETURN
           });
 
-          var selectedItemText = $( '.dropdown__item--selected' ).find('p').text();
+          var selectedItemText = $( '.mentioner__dropdown__item--selected' ).find('p').text();
 
           medium.trigger('editableKeyup', event, $editor);
 

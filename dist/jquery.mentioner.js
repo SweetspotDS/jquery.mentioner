@@ -1,4 +1,4 @@
-/*! jquery.mentioner - v0.0.1 - 2015-06-24
+/*! jquery.mentioner - v0.0.1 - 2015-06-25
 * Copyright (c) 2015 MediaSQ; Licensed MIT */
 (function ($) {
   'use strict';
@@ -25,12 +25,20 @@
     this.maxMentionablesToShow = settings.maxMentionablesToShow || 5;
     this.mentionSymbol = settings.mentionSymbol || '@';
     this.matcher = settings.matcher || this.defaultMatcher;
-    this.mentionables = (settings.requester ? settings.requester() : []).sort(function(prev, next){
-      return prev.name.localeCompare(next.name);
-    });
+    this.mentionables = [];
+
+    if(settings.requester) {
+      settings.requester.call(this, this.loadMentionables.bind(this));
+    }
 
     this.buildDOM();
     this.attachEvents();
+  };
+
+  Mentioner.prototype.loadMentionables = function (mentionables) {
+    this.mentionables = mentionables.sort(function(prev, next){
+      return prev.name.localeCompare(next.name);
+    });
   };
 
   Mentioner.prototype.defaultMatcher = function (mentionable, query) {
@@ -181,11 +189,7 @@
     var preMentionText = text.slice(0, selection.end);
     var currentMentionSymbolIndex = preMentionText.lastIndexOf(this.mentionSymbol);
     var mentionTextTrigger = preMentionText.slice(currentMentionSymbolIndex, selection.end);
-    var sanetizedMentionTextTrigger = this.clearEntities(mentionTextTrigger, {
-      "160": function(index, query) {
-        return query.length > 1 ? this.replaceAt(query, index, '&nbsp;') : '&nbsp;';
-      }
-    });
+    var sanetizedMentionTextTrigger = this.replaceNbspEntities(mentionTextTrigger, '&nbsp;');
     var regex = new RegExp('(' + sanetizedMentionTextTrigger + ')(<input)');
     var normalized = this.$root.html().replace(regex, function(match, p1, p2) { return p2; });
 
@@ -205,7 +209,7 @@
 
   Mentioner.prototype.search = function(query) {
     var that = this;
-    var sanitizedQuery = that.clearEntities(query);
+    var sanitizedQuery = that.escapeRegExp(that.replaceNbspEntities(query));
     var candidates = that.mentionables.filter(function(mentionable) {
       return that.matcher.call(that, mentionable, sanitizedQuery);
     }).slice(0, that.maxMentionablesToShow);
@@ -217,33 +221,25 @@
     }
   };
 
-  Mentioner.prototype.replaceAt = function (string, index, replacement) {
+  Mentioner.prototype.replaceAt = function(string, index, replacement) {
     return string.slice(0, index) + replacement + string.slice(index + 1);
   };
 
-  Mentioner.prototype.clearEntities = function(query, customReplacements) {
-    var replacements = $.extend({}, {
-      "160": function(index, query) {
-        return query.length > 1 ? this.replaceAt(query, index, ' ')  : ' ';
-      },
-      "10": function(index, query) {
-        return query.slice(0, index);
-      }
-    }, customReplacements);
+  Mentioner.prototype.replaceNbspEntities = function(query, replacement) {
+    replacement = replacement || ' ';
+    var nbsp = String.fromCharCode(160);
+    var nbspIndex = query.indexOf(nbsp);
 
-    var result = query;
-
-    for(var code in replacements) {
-      var replacement = replacements[code];
-      var charCode = String.fromCharCode(parseInt(code));
-      var entityIndex = result.indexOf(charCode);
-
-      if(entityIndex > -1) {
-        result = replacement.call(this, entityIndex, result);
-      }
+    if(nbspIndex > -1) {
+      return query.length > 1 ? this.replaceAt(query, nbspIndex, replacement) : replacement;
+    } else {
+      return query;
     }
+  };
 
-    return result;
+  Mentioner.prototype.escapeRegExp = function(query) {
+    // "Is there a RegExp.escape function in Javascript?": http://stackoverflow.com/a/3561711
+    return query.replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
   };
 
   Mentioner.prototype.$parentWrapper = function() {
@@ -349,8 +345,7 @@
 
   Mentioner.prototype.getStyleForDropdown = function() {
     var top = this.$root.outerHeight() + 10;
-    var rootPaddingLeft = this.$root.css('padding-left');
-    var left = this.$root.offset().left - parseInt(rootPaddingLeft);
+    var left = this.$root.offset().left - this.$root.parent().offset().left;
 
     return 'top: ' + top + 'px; left: ' + left + 'px;';
   };

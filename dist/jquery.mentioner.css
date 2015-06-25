@@ -9,7 +9,8 @@
 
 .mentioner__dropdown {
   max-width: 250px;
-  position: absolute; }
+  position: absolute;
+  z-index: 99999; }
   .mentioner__dropdown--hidden {
     display: none; }
 

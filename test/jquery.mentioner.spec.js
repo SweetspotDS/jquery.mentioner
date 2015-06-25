@@ -7,14 +7,14 @@
       medium = new MediumEditor('.js-editor', { placeholder: false, disableToolbar: true });
       $editor = $( '.js-editor' ).mentioner({
         editor: medium,
-        requester: function() {
-          return [
+        requester: function(callback) {
+          callback.call(this, [
             { name: 'Jon Snow', avatar: '', id: 0 },
             { name: 'Sansa Stark', avatar: '', id: 5 },
             { name: 'Arya Stark', avatar: '', id: 6 },
             { name: 'Petyr Baelish', avatar: '', id: 7 },
             { name: 'Hodor', avatar: '', id: 8 }
-          ];
+          ]);
         }
       });
     });

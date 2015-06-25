@@ -51,6 +51,7 @@
 .mentioner__composer {
   border-radius: 3px;
   font-size: 13px;
+  line-height: 1.4;
   min-height: 13px;
   padding: 10px;
   background-color: #F5F5F5;

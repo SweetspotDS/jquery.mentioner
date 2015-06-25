@@ -13,6 +13,7 @@
 .mentioner__dropdown {
   max-width: 250px;
   position: absolute;
+  z-index: 99999;
 
   &--hidden {
     display: none;

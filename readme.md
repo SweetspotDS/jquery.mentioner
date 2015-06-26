@@ -32,7 +32,6 @@ A brand-new plugin for mentioning users by using jQuery and the [MediumEditor](h
   </script>
 </body>
 </html>
-
 ```
 
 ## Options

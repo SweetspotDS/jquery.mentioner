@@ -54,11 +54,7 @@ A brand-new plugin for mentioning users by using jQuery and the [MediumEditor](h
 
 ## Development
 
-1. `npm install`
-2. `bower install`
-3. `grunt serve`
-
-At this moment all the specs should pass: `localhost:9000/test/jquery.mentioner.html`
++info: [CONTRIBUTING](contributing.md).
 
 ## License
 

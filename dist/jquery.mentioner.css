@@ -16,24 +16,34 @@
 
 .mentioner__dropdown__item {
   display: table;
+  font-size: 13px;
   padding: 10px 0;
   table-layout: fixed;
   width: 100%;
-  cursor: pointer; }
+  cursor: pointer;
+  font-family: sans-serif; }
+
+.mentioner__dropdown__item--help {
+  padding-left: 15px;
+  width: calc(100% - 15px); }
 
 .mentioner__dropdown__item:hover, .mentioner__dropdown__item--selected {
   background-color: #ECECEC; }
+
+.mentioner__dropdown__item--help:hover {
+  background-color: white; }
+
+.mentioner__dropdown__item--selected--help {
+  background-color: white; }
 
 .mentioner__dropdown__item__name, .mentioner__dropdown__item__avatar {
   display: table-cell;
   vertical-align: middle; }
 
 .mentioner__dropdown__item__name {
-  font-size: 13px;
   margin: 0;
   overflow: hidden;
   width: 80%;
-  font-family: sans-serif;
   text-overflow: ellipsis;
   white-space: nowrap; }
 

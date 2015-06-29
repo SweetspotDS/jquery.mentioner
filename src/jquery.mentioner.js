@@ -18,7 +18,8 @@
   var MENTIONER_HOOK_CLASSES = {
     WRAPPER: 'js-mentioner-wrapper',
     DROPDOWN: 'js-mentioner-dropdown',
-    DROPDOWN_ITEM: 'js-mentioner-dropdown-item'
+    DROPDOWN_ITEM: 'js-mentioner-dropdown-item',
+    DROPDOWN_HELP_ITEM: 'js-mentioner-dropdown-help-item'
   };
 
   var Mentioner = function($root, settings) {
@@ -29,6 +30,7 @@
     this.minQueryLength = settings.minQueryLength || 1;
     this.maxMentionablesToShow = settings.maxMentionablesToShow || 5;
     this.mentionSymbol = settings.mentionSymbol || '@';
+    this.dropdownHelpMessage = settings.dropdownHelpMessage || 'Type to search for results';
     this.matcher = settings.matcher || this.defaultMatcher;
     this.mentionables = [];
 
@@ -94,8 +96,12 @@
     var lastMentionSymbolIndex = preSelectionText.lastIndexOf(this.mentionSymbol);
     var query = preSelectionText.slice(lastMentionSymbolIndex + 1);
 
-    if(lastMentionSymbolIndex > -1 && this.lastKeyDown !== KEYS.RETURN && query.length >= this.minQueryLength) {
-      this.search(query);
+    if(lastMentionSymbolIndex > -1 && this.lastKeyDown !== KEYS.RETURN) {
+      if(query.length >= this.minQueryLength) {
+        this.search(query);
+      } else {
+        this.showDropdownHelp();
+      }
     } else {
       this.hideDropdown();
     }
@@ -220,7 +226,7 @@
     }).slice(0, that.maxMentionablesToShow);
 
     if(candidates.length > 0) {
-      that.showDropdown(candidates, sanitizedQuery);
+      that.showDropdownCandidates(candidates, sanitizedQuery);
     } else {
       that.hideDropdown();
     }
@@ -259,17 +265,35 @@
     return this.$dropdown().find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM);
   };
 
-  Mentioner.prototype.showDropdown = function(candidates, query) {
+  Mentioner.prototype.showDropdownCandidates = function(candidates, query) {
     var $dropdownOptionsToAppend = this.getDropdownOptionsToAppend(candidates);
 
     var $dropdown = this.$dropdown();
+    $dropdown.find('.' + MENTIONER_HOOK_CLASSES.DROPDOWN_HELP_ITEM).remove();
     $dropdown.append($dropdownOptionsToAppend);
-    $dropdown.attr('style', this.getStyleForDropdown());
-    $dropdown.removeClass('mentioner__dropdown--hidden');
 
     this.highlightDropdownOptions($dropdownOptionsToAppend, query);
     this.removeOrphanDropdownOptions(candidates);
     this.checkSelectedDropdownOption();
+    this.showDropdown($dropdown);
+  };
+
+  Mentioner.prototype.showDropdownHelp = function () {
+    var $helpMessage = $([
+      '<li class="' + MENTIONER_HOOK_CLASSES.DROPDOWN_HELP_ITEM + ' mentioner__dropdown__item mentioner__dropdown__item--help">',
+        this.dropdownHelpMessage,
+      '</li>'
+    ].join(''));
+
+    var $dropdown = this.$dropdown().empty();
+    $dropdown.append($helpMessage);
+
+    this.showDropdown($dropdown);
+  };
+
+  Mentioner.prototype.showDropdown = function ($dropdown) {
+    $dropdown.attr('style', this.getStyleForDropdown());
+    $dropdown.removeClass('mentioner__dropdown--hidden');
   };
 
   Mentioner.prototype.getDropdownOptionsToAppend = function(candidates) {

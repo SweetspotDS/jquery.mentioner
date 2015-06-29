@@ -23,11 +23,18 @@ $composer-font-size: 13px;
 
 .mentioner__dropdown__item {
   display: table;
+  font-size: 13px;
   padding: 10px 0;
   table-layout: fixed;
   width: 100%;
 
   cursor: pointer;
+  font-family: sans-serif;
+}
+
+.mentioner__dropdown__item--help {
+  padding-left: 15px;
+  width: calc(100% - 15px);
 }
 
 %dropdown-item-selected {
@@ -38,8 +45,16 @@ $composer-font-size: 13px;
   @extend %dropdown-item-selected;
 }
 
+.mentioner__dropdown__item--help:hover {
+  background-color: white;
+}
+
 .mentioner__dropdown__item--selected {
   @extend %dropdown-item-selected;
+
+  &--help {
+    background-color: white;
+  }
 }
 
 %dropdown__item__cell {
@@ -50,12 +65,10 @@ $composer-font-size: 13px;
 .mentioner__dropdown__item__name {
   @extend %dropdown__item__cell;
 
-  font-size: 13px;
   margin: 0;
   overflow: hidden;
   width: 80%;
 
-  font-family: sans-serif;
   text-overflow: ellipsis;
   white-space: nowrap;
 }

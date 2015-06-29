@@ -414,7 +414,6 @@
   };
 
   Mentioner.prototype.triggerMention = function () {
-    this.$root.focus();
     this.editor.cleanPaste(this.mentionSymbol);
   };
 

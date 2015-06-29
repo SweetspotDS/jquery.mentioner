@@ -82,6 +82,7 @@
     this.editor.subscribe('editableKeydown', this.onRootKeydown.bind(this));
     this.editor.subscribe('editableKeydownEnter', this.onRootKeydownEnter.bind(this));
 
+    this.$dropdown().on('mousedown', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_HELP_ITEM, this.onDropdownHelpItemMousedown.bind(this));
     this.$dropdown().on('mousedown', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemMousedown());
   };
 
@@ -152,6 +153,10 @@
   };
 
   Mentioner.prototype.onRootKeydownEnter = function(event) {
+    this.dropdownEventWrapper(event, $.noop);
+  };
+
+  Mentioner.prototype.onDropdownHelpItemMousedown = function (event) {
     this.dropdownEventWrapper(event, $.noop);
   };
 
@@ -419,6 +424,8 @@
   };
 
   Mentioner.prototype.triggerMention = function () {
+    this.lastKeyDown = null; // Reset the lastKeyDown variable for preventing
+                             // false values from the last interaction.
     this.editor.cleanPaste(this.mentionSymbol);
   };
 

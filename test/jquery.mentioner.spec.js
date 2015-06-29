@@ -153,11 +153,11 @@
           $editor.focus();
         });
 
-        it('doesn\'t show the dropdown when the query is not long enough', function() {
+        it('shows the dropdown help message when the query is not long enough', function() {
           medium.cleanPaste('@');
 
-          var $dropdown = $( '.js-mentioner-dropdown' );
-          $dropdown.hasClass('mentioner__dropdown--hidden').should.be.true;
+          var $dropdownHelpMessage = $( '.js-mentioner-dropdown-help-item' );
+          $dropdownHelpMessage.should.exist;
         });
 
         it('shows the dropdown when the query long enough', function() {

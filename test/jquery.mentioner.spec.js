@@ -214,6 +214,18 @@
           });
 
         });
+
+        describe('#triggerMention', function() {
+
+          it('pastes a mentionSymbol and show the dropdown with the help message', function() {
+            var $dropdown = $( '.js-mentioner-dropdown' );
+
+            $editor.mentioner('triggerMention');
+
+            $dropdown.hasClass('mentioner__dropdown--hidden').should.be.false;
+            $dropdown.find('.js-mentioner-dropdown-help-item').should.exist;
+          });
+        });
       });
     });
   });

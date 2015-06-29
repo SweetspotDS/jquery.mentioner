@@ -418,6 +418,11 @@
     });
   };
 
+  Mentioner.prototype.triggerMention = function () {
+    this.$root.focus();
+    this.editor.cleanPaste(this.mentionSymbol);
+  };
+
   var Api = function($root, settings) {
     this.mentioner = new Mentioner($root, settings);
   };
@@ -428,6 +433,10 @@
 
   Api.prototype.getMentions = function () {
     return this.mentioner.getMentions();
+  };
+
+  Api.prototype.triggerMention = function () {
+    this.mentioner.triggerMention();
   };
 
   $.fn.mentioner = function (options) {

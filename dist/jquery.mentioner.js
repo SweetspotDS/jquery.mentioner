@@ -1,4 +1,4 @@
-/*! jquery.mentioner - v0.0.1 - 2015-06-29
+/*! jquery.mentioner - v0.0.1 - 2015-07-02
 * Copyright (c) 2015 MediaSQ; Licensed MIT */
 (function ($) {
   'use strict';
@@ -165,7 +165,7 @@
       var inputId = new Date().getTime();
       var inputWidth = that.getWidthForInput(mentionable.name);
       var html = '<input id="' + inputId + '" data-mentionable-id="' + mentionable.id + '" value="' +
-        mentionable.name + '" style="width:' + inputWidth + 'px;" class="mentioner__composer__mention js-mention" readonly />';
+        mentionable.name + '" style="width:' + inputWidth + 'px;" class="mentioner__composer__mention js-mention" disabled />';
 
       that.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
 

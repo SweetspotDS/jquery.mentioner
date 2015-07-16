@@ -75,8 +75,8 @@
   border: 0;
   font-size: 13px;
   line-height: 1.4;
-  padding: 0 3px;
   color: #000;
-  font-family: sans-serif; }
+  font-family: sans-serif;
+  text-align: center; }
 
 /*# sourceMappingURL=jquery.mentioner.css.map */

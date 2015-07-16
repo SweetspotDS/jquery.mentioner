@@ -22,6 +22,8 @@
     DROPDOWN_HELP_ITEM: 'js-mentioner-dropdown-help-item'
   };
 
+  var CORRECTION_FACTOR_FOR_TEXT_RENDERING = 6;
+
   var Mentioner = function($root, settings) {
     this.$root = $root;
 
@@ -220,7 +222,7 @@
     var width = $span.width();
     $span.remove();
 
-    return width;
+    return width + CORRECTION_FACTOR_FOR_TEXT_RENDERING;
   };
 
   Mentioner.prototype.search = function(query) {

@@ -51,6 +51,7 @@ A brand-new plugin for mentioning users by using jQuery and the [MediumEditor](h
 | ------ | :---------: | ----------- |
 | `serialize` | `String` | Returns an HTML which represents the content of the mentioner container. |
 | `getMentions` | `Array` | Returns an array with the collection of inserted mentions. Each mention is represented with the same object that its related mentionable. |
+| `triggerMention` | `undefined` | When the mentioner is focused, it pastes the mentionSymbol and trigger the dropdown. |
 
 ## Development
 

@@ -17,13 +17,13 @@ Test that Grunt's CLI and Bower are installed by running `grunt --version` and `
 1. Run `bower install` to install the front-end dependencies.
 1. Run `grunt` to grunt this project.
 
-Assuming that you don't see any red, you're ready to go. Just be sure to run `grunt` after making any changes, to ensure that nothing is broken.
+Assuming that you don't see any red, you're ready to go. Just be sure to open `test/*.html` after making any changes, to ensure that nothing is broken.
 
 ## Submitting pull requests
 
 1. Create a new branch, please don't work in your `master` branch directly.
 1. Run `grunt serve`
-1. Add failing tests for the change you want to make. Run `grunt` to see the tests fail.
+1. Add failing tests for the change you want to make. Open `test/*.html` to see the tests fail.
 1. Fix stuff.
 1. Open `test/*.html` unit test file(s) in actual browser to ensure tests pass everywhere. Repeat steps 3-5 until done.
 1. Update the documentation to reflect any changes.

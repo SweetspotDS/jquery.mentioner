@@ -1,3 +1,341 @@
 <!DOCTYPE html>
 <html>
+  <head>
+    <link href="medium-editor.min.css" rel="stylesheet" type="text/css">
+    <link href="jquery.mentioner.css" rel="stylesheet" type="text/css">
+
+    <link href='http://fonts.googleapis.com/css?family=Lato:300,400,700' rel='stylesheet' type='text/css'>
+
+    <title>Examples for jquery.mentioner</title>
+    <script src="medium-editor.min.js"></script>
+    <script src="jquery.min.js"></script>
+    <script src="jquery.mentioner.js"></script>
+
+    <style media="screen">
+      body {
+        font-family: 'Lato', sans-serif;
+        margin: 0;
+      }
+
+      .title {
+        font-size: 48px;
+        font-weight: 300;
+        text-align: center;
+
+        color: #fc3952;
+      }
+
+      .subtitle {
+        font-size: 28px;
+        text-align: center;
+      }
+
+      .mentioner__composer {
+        margin: 0 auto;
+        text-align: left;
+        width: 400px;
+      }
+
+      .hint {
+        font-size: 12px;
+        text-align: center;
+
+        color: #a0a0a0;
+        font-style: italic;
+      }
+
+      .buttons {
+        margin: 10px 0;
+        text-align: center;
+      }
+
+      .table {
+        margin: 0 auto;
+        max-width: 900px;
+        table-layout: fixed;
+      }
+
+      .table__cell {
+        text-align: center;
+      }
+
+      .table__cell:last-of-type {
+        padding: 5px;
+        text-align: left;
+      }
+
+      .section {
+        max-width: 900px;
+        margin: 0 auto;
+        padding-top: 30px;
+        text-align: center;
+      }
+
+      .section:last-of-type {
+        padding-bottom: 30px;
+      }
+
+      .section--is-left {
+        text-align: left;
+      }
+
+      .code-block {
+        margin: 0 auto;
+        max-width: 645px;
+      }
+
+      .footer {
+        padding: 30px;
+        background-color: #fc3952;
+      }
+
+      .footer__text {
+        margin: 0;
+        text-align: center;
+
+        color: #fff;
+        font-weight: 700;
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1 class="title">jquery.mentioner</h1>
+
+    </header>
+
+    <section class="section">
+      <div class="js-composer"></div>
+      <p class="hint">Hint: Game of Thrones characters inside</p>
+
+      <div class="buttons">
+        <button class="js-serialize-button">Serialize</button>
+        <button class="js-get-mentions-button">Get Mentions</button>
+        <button class="js-trigger-mention-button" title="Mentioner needs to be focused!">Trigger mention</button>
+      </div>
+    </section>
+
+    <section class="section section--is-left">
+      <h2 class="subtitle">Getting started</h2>
+      <pre class="code-block">
+        &lt;!DOCTYPE html&gt;
+          &lt;html&gt;
+            &lt;head&gt;
+              &lt;link href=&quot;jquery.mentioner.css&quot; rel=&quot;stylesheet&quot; type=&quot;text/css&quot;&gt;
+            &lt;/head&gt;
+            &lt;body&gt;
+              &lt;div class=&quot;js-editor&quot;&gt;&lt;/div&gt;
+
+              &lt;script src=&quot;jquery.js&quot;&gt;&lt;/script&gt;
+              &lt;script src=&quot;medium-editor.js&quot;&gt;&lt;/script&gt;
+              &lt;script src=&quot;jquery.mentioner.js&quot;&gt;&lt;/script&gt;
+              &lt;script&gt;
+                var medium = new MediumEditor('.js-editor');
+
+                $( '.js-editor' ).mentioner({
+                  editor: medium,
+                  requester: function(callback) {
+                    var mentionables = [
+                      // your mentionables
+                    ];
+
+                    callback.call(this, mentionables);
+                  }
+                });
+              &lt;/script&gt;
+            &lt;/body&gt;
+          &lt;/html&gt;
+      </pre>
+    </section>
+
+    <section class="section">
+      <h2 class="subtitle">Options</h2>
+      <table class="table">
+        <colgroup width="33%" />
+        <colgroup width="33%" />
+        <colgroup width="33%" />
+        <thead>
+          <tr>
+            <th class="table__cell">Option</th>
+            <th class="table__cell">Default value</th>
+            <th class="table__cell">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="table__cell"><code>editor</code></td>
+            <td class="table__cell"><code>undefined</code></td>
+            <td class="table__cell">The related MediumEditor's instance</td>
+          </tr>
+          <tr>
+            <td class="table__cell"><code>minQueryLength</code></td>
+            <td class="table__cell"><code>1</code></td>
+            <td class="table__cell">Minimun amount of characters needed to trigger the mentions dropdown</td>
+          </tr>
+          <tr>
+            <td class="table__cell"><code>maxMentionablesToShow</code></td>
+            <td class="table__cell"><code>5</code></td>
+            <td class="table__cell">Maximum number of results shown on the dropdown</td>
+          </tr>
+          <tr>
+            <td class="table__cell"><code>mentionSymbol</code></td>
+            <td class="table__cell"><code>@</code></td>
+            <td class="table__cell">Symbol for triggering the mentions search</td>
+          </tr>
+          <tr>
+            <td class="table__cell"><code>requester</code></td>
+            <td class="table__cell"><code>undefined</code></td>
+            <td class="table__cell">Function for requesting the mentionables collection</td>
+          </tr>
+          <tr>
+            <td class="table__cell"><code>matcher</code></td>
+            <td class="table__cell">Function for matching by different parts of the user's name</td>
+            <td class="table__cell">Function for defining how to select the results from the mentionables collection</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2 class="subtitle">API</h2>
+      <table class="table">
+        <colgroup width="33%" />
+        <colgroup width="33%" />
+        <colgroup width="33%" />
+        <thead>
+          <tr>
+            <th class="table__cell">Method</th>
+            <th class="table__cell">Return Type</th>
+            <th class="table__cell">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="table__cell"><code>serialize</code></td>
+            <td class="table__cell"><code>String</code></td>
+            <td class="table__cell">Returns an HTML which represents the content of the mentioner container.</td>
+          </tr>
+          <tr>
+            <td class="table__cell"><code>getMentions</code></td>
+            <td class="table__cell"><code>Array</code></td>
+            <td class="table__cell">Returns an array with the collection of inserted mentions. Each mention is represented with the same object that its related mentionable.</td>
+          </tr>
+          <tr>
+            <td class="table__cell"><code>triggerMention</code></td>
+            <td class="table__cell"><code>undefined</code></td>
+            <td class="table__cell">When the mentioner is focused, it pastes the <code>mentionSymbol</code> and trigger the dropdown.</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2 class="subtitle">Dependencies</h2>
+
+      <p><a href="https://jquery.com/">jQuery</a></p>
+      <p><a href="https://github.com/yabwe/medium-editor">MediumEditor</a></p>
+    </section>
+
+    <a href="https://github.com/MediaSQ/jquery.mentioner">
+      <img style="position: absolute; top: 0; right: 0; border: 0;" src="https://camo.githubusercontent.com/38ef81f8aca64bb9a64448d0d70f1308ef5341ab/68747470733a2f2f73332e616d617a6f6e6177732e636f6d2f6769746875622f726962626f6e732f666f726b6d655f72696768745f6461726b626c75655f3132313632312e706e67" alt="Fork me on GitHub" data-canonical-src="https://s3.amazonaws.com/github/ribbons/forkme_right_darkblue_121621.png">
+    </a>
+
+    <footer class="footer">
+      <p class="footer__text">MediaSQ &copy; 2015</p>
+    </footer>
+
+    <script type="text/javascript">
+      $(document).ready(function() {
+        var editor = new MediumEditor('.js-composer', {
+          placeholder: false,
+          disableToolbar: true
+        });
+
+        var $composer = $( '.js-composer' );
+
+        var mentionables = [
+          {
+            name: 'Jon Snow',
+            avatar: 'https://33.media.tumblr.com/avatar_b9a6fd7fe379_128.png',
+            id: 0
+          },
+          {
+            name: 'Daenerys Targaryen',
+            avatar: 'https://pbs.twimg.com/profile_images/535512430290673665/_pl2jNgF.jpeg',
+            id: 1
+          },
+          {
+            name: 'Tyrion Lannister',
+            avatar: 'https://gp4.googleusercontent.com/-hBCcPT52DQk/AAAAAAAAAAI/AAAAAAAAAAA/22zJFbXDK6I/s48-c-k-no/photo.jpg?sz=50',
+            id: 2
+          },
+          {
+            name: 'Cersei Lannister',
+            avatar: 'https://lh5.googleusercontent.com/-n5QJb1oEA1E/AAAAAAAAAAI/AAAAAAAAABI/jaoli3bi0oo/photo.jpg?sz=50',
+            id: 3
+          },
+          {
+            name: 'Jaime Lannister',
+            avatar: 'https://pbs.twimg.com/profile_images/2258491879/jaime-lannister-160_normal.jpg',
+            id: 4
+          },
+          {
+            name: 'Sansa Stark',
+            avatar: 'https://lh4.googleusercontent.com/-dUPMKG9P87E/AAAAAAAAAAI/AAAAAAAAdjI/sx0mvfffwR8/photo.jpg?sz=50',
+            id: 5
+          },
+          {
+            name: 'Arya Stark',
+            avatar: 'http://cheatsheetworld.com/img/entertainment/game-of-thrones/game-of-thrones-arya-stark.jpg',
+            id: 6
+          },
+          {
+            name: 'Petyr Baelish',
+            avatar: 'https://pbs.twimg.com/profile_images/3523397119/465d65e7d353a4353fa0e0ef9e2f9948.png',
+            id: 7
+          },
+          {
+            name: 'Hodor',
+            avatar: 'https://lh4.googleusercontent.com/-vAOo9SxCZhI/AAAAAAAAAAI/AAAAAAAAByE/cNWt8OM10g0/photo.jpg?sz=50',
+            id: 8
+          },
+          {
+            name: 'Theon Greyjoy',
+            avatar: 'https://pbs.twimg.com/profile_images/2219229967/theon_normal.jpg',
+            id: 9
+          },
+          {
+            name: 'Melisandre',
+            avatar: 'http://cdn.images.express.co.uk/img/dynamic/galleries/64x64/55658.jpg',
+            id: 10
+          }
+        ];
+
+        $composer.mentioner({
+          editor: editor,
+          requester: function(callback) {
+            callback.call(this, mentionables);
+          }
+        });
+
+        $( '.js-serialize-button' ).click(function() {
+          var html = $composer.mentioner('serialize');
+
+          alert(html);
+        });
+
+        $( '.js-get-mentions-button' ).click(function() {
+          var mentions = $composer.mentioner('getMentions');
+          var json = JSON.stringify(mentions);
+
+          alert(json);
+        });
+
+        $( '.js-trigger-mention-button' ).click(function() {
+          $composer.mentioner('triggerMention');
+        });
+      });
+    </script>
+
+  </body>
 </html>

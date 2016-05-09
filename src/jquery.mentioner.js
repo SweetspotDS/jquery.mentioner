@@ -2,7 +2,7 @@
  *
  *
  *
- * Copyright (c) 2015 MediaSQ
+ * Copyright (c) 2016 MediaSQ
  * Licensed under the MIT license.
  */
 (function ($) {
@@ -36,7 +36,7 @@
     this.matcher = settings.matcher || this.defaultMatcher;
     this.mentionables = [];
 
-    if(settings.requester) {
+    if (settings.requester) {
       settings.requester.call(this, this.loadMentionables.bind(this));
     }
 
@@ -45,7 +45,7 @@
   };
 
   Mentioner.prototype.loadMentionables = function (mentionables) {
-    this.mentionables = mentionables.sort(function(prev, next){
+    this.mentionables = mentionables.sort(function(prev, next) {
       return prev.name.localeCompare(next.name);
     });
   };
@@ -59,7 +59,7 @@
     candidates.push.apply(candidates, mentionableName.split(' '));
 
     candidates.forEach(function(candidate) {
-      if(regex.test(candidate)) {
+      if (regex.test(candidate)) {
         hasMatch = true;
       }
     });
@@ -99,8 +99,8 @@
     var lastMentionSymbolIndex = preSelectionText.lastIndexOf(this.mentionSymbol);
     var query = preSelectionText.slice(lastMentionSymbolIndex + 1);
 
-    if(lastMentionSymbolIndex > -1 && this.lastKeyDown !== KEYS.RETURN) {
-      if(query.length >= this.minQueryLength) {
+    if (lastMentionSymbolIndex > -1 && this.lastKeyDown !== KEYS.RETURN) {
+      if (query.length >= this.minQueryLength) {
         this.search(query);
       } else {
         this.showDropdownHelp();
@@ -111,7 +111,7 @@
   };
 
   Mentioner.prototype.dropdownEventWrapper = function(event, callback) {
-    if(this.isDropdownDisplayed()) {
+    if (this.isDropdownDisplayed()) {
       event.preventDefault();
 
       callback.call(this);
@@ -119,7 +119,7 @@
   };
 
   Mentioner.prototype.onEditableKeyup = function(event) {
-    if(event.keyCode === KEYS.RETURN) {
+    if (event.keyCode === KEYS.RETURN) {
       this.dropdownEventWrapper(event, function() {
         this.getSelectedDropdownOption().trigger('mousedown');
       });
@@ -130,27 +130,27 @@
     this.lastKeyDown = event.keyCode;
 
     switch (event.keyCode) {
-      case KEYS.ESC:
-        this.dropdownEventWrapper(event, function() {
-          this.hideDropdown();
-        });
+    case KEYS.ESC:
+      this.dropdownEventWrapper(event, function() {
+        this.hideDropdown();
+      });
       break;
-      case KEYS.DOWN:
-        this.dropdownEventWrapper(event, function() {
-          this.selectOtherDropdownOption(function($selected) {
-            return $selected.next().length === 0 ? $selected.siblings().first() : $selected.next();
-          });
+    case KEYS.DOWN:
+      this.dropdownEventWrapper(event, function() {
+        this.selectOtherDropdownOption(function($selected) {
+          return $selected.next().length === 0 ? $selected.siblings().first() : $selected.next();
         });
+      });
       break;
-      case KEYS.UP:
-        this.dropdownEventWrapper(event, function() {
-          this.selectOtherDropdownOption(function($selected) {
-            return $selected.prev().length === 0 ? $selected.siblings().last() : $selected.prev();
-          });
+    case KEYS.UP:
+      this.dropdownEventWrapper(event, function() {
+        this.selectOtherDropdownOption(function($selected) {
+          return $selected.prev().length === 0 ? $selected.siblings().last() : $selected.prev();
         });
+      });
       break;
-      default:
-        return true;
+    default:
+      return true;
     }
   };
 
@@ -232,7 +232,7 @@
       return that.matcher.call(that, mentionable, sanitizedQuery);
     }).slice(0, that.maxMentionablesToShow);
 
-    if(candidates.length > 0) {
+    if (candidates.length > 0) {
       that.showDropdownCandidates(candidates, sanitizedQuery);
     } else {
       that.hideDropdown();
@@ -248,7 +248,7 @@
     var nbsp = String.fromCharCode(160);
     var nbspIndex = query.indexOf(nbsp);
 
-    if(nbspIndex > -1) {
+    if (nbspIndex > -1) {
       return query.length > 1 ? this.replaceAt(query, nbspIndex, replacement) : replacement;
     } else {
       return query;
@@ -288,7 +288,7 @@
   Mentioner.prototype.showDropdownHelp = function () {
     var $helpMessage = $([
       '<li class="' + MENTIONER_HOOK_CLASSES.DROPDOWN_HELP_ITEM + ' mentioner__dropdown__item mentioner__dropdown__item--help">',
-        this.dropdownHelpMessage,
+      this.dropdownHelpMessage,
       '</li>'
     ].join(''));
 
@@ -312,7 +312,7 @@
         return mentionable.id === candidate.id;
       });
 
-      if($relatedDropdownOption.length !== 0) {
+      if ($relatedDropdownOption.length !== 0) {
         $relatedDropdownOption.find('p').html(candidate.name);
 
         return $relatedDropdownOption;
@@ -338,11 +338,11 @@
   Mentioner.prototype.removeOrphanDropdownOptions = function(candidates) {
     this.getDropdownOptions().each(function() {
       var mentionable = $(this).data('mentionable');
-      var candidate = candidates.filter(function(candidate) {
-        return candidate.id === mentionable.id;
+      var candidate = candidates.filter(function(c) {
+        return c.id === mentionable.id;
       })[0];
 
-      if(!candidate) {
+      if (!candidate) {
         $(this).remove();
       }
     });
@@ -353,7 +353,7 @@
     var $name = $( '<p class="mentioner__dropdown__item__name">' + mentionable.name + '</p>' );
     var $avatar = $([
       '<div class="mentioner__dropdown__item__avatar">',
-        '<img class="mentioner__dropdown__item__avatar__image" src="' + mentionable.avatar + '" />',
+      '<img class="mentioner__dropdown__item__avatar__image" src="' + mentionable.avatar + '" />',
       '</div>'
     ].join('\n'));
 
@@ -367,7 +367,7 @@
   Mentioner.prototype.checkSelectedDropdownOption = function() {
     var $selected = this.getSelectedDropdownOption();
 
-    if($selected.length === 0) {
+    if ($selected.length === 0) {
       var $oldSelected = $();
       var $newSelected = this.getDropdownOptions().first();
 
@@ -448,16 +448,16 @@
   };
 
   $.fn.mentioner = function (options) {
-    if(typeof options === 'object') {
+    if (typeof options === 'object') {
       return this.each(function () {
         var $subject = $( this );
-        if($subject.data('mentioner') === undefined) {
+        if ($subject.data('mentioner') === undefined) {
           $subject.data('mentioner', new Api($subject, options));
         }
       });
-    } else if(typeof options === 'string') {
+    } else if (typeof options === 'string') {
       var instance = $( this ).data('mentioner');
-      if(instance && typeof instance[options] === 'function') {
+      if (instance && typeof instance[options] === 'function') {
         return instance[options]();
       }
     }

@@ -7,7 +7,7 @@
       medium = new MediumEditor('.js-editor', { placeholder: false, disableToolbar: true });
       $editor = $( '.js-editor' ).mentioner({
         editor: medium,
-        requester: function(callback) {
+        requester: function(callback) {
           callback.call(this, [
             { name: 'Jon Snow', avatar: '', id: 0 },
             { name: 'Sansa Stark', avatar: '', id: 5 },
@@ -54,7 +54,7 @@
         $candidates.first().hasClass('mentioner__dropdown__item--selected').should.be.true;
       });
 
-      it('highlights the part of the candidate\'s name that matches the query', function() {
+      it('highlights the part of the candidate\'s name that matches the query', function() {
         $candidates.each(function() {
           var $p = $(this).find('p');
           var highlight = '<span class="mentioner__dropdown__item__name__highlight">S</span>';

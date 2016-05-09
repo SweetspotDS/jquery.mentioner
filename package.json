@@ -13,8 +13,9 @@
   "repository": "mediasq/jquery.mentioner",
   "license": "MIT",
   "scripts": {
-    "test": "grunt"
+    "build": "grunt"
   },
+  "main": "./dist/jquery.mentioner.js",
   "devDependencies": {
     "chai": "^3.5.0",
     "grunt": "^0.4.5",

@@ -29,8 +29,7 @@
 
     this.lastKeyDown = null;
     this.editor = settings.editor;
-    this.minQueryLength = settings.minQueryLength || 1;
-    this.maxMentionablesToShow = settings.maxMentionablesToShow || 5;
+    this.minQueryLength = settings.minQueryLength || 0;
     this.mentionSymbol = settings.mentionSymbol || '@';
     this.dropdownHelpMessage = settings.dropdownHelpMessage || 'Type to search for results';
     this.matcher = settings.matcher || this.defaultMatcher;
@@ -230,7 +229,7 @@
     var sanitizedQuery = that.escapeRegExp(that.replaceNbspEntities(query));
     var candidates = that.mentionables.filter(function(mentionable) {
       return that.matcher.call(that, mentionable, sanitizedQuery);
-    }).slice(0, that.maxMentionablesToShow);
+    });
 
     if (candidates.length > 0) {
       that.showDropdownCandidates(candidates, sanitizedQuery);
@@ -398,13 +397,29 @@
   Mentioner.prototype.selectOtherDropdownOption = function(getter) {
     var $oldSelected = this.getSelectedDropdownOption();
     var $newSelected = $oldSelected.siblings().length === 0 ? $oldSelected : getter.call(this, $oldSelected);
+
     this.selectDropdownOption($oldSelected, $newSelected);
+    this.manageDropdownScroll();
   };
 
   Mentioner.prototype.selectDropdownOption = function($oldSelected, $newSelected) {
     $oldSelected.removeClass('mentioner__dropdown__item--selected');
     $newSelected.addClass('mentioner__dropdown__item--selected');
   };
+
+  Mentioner.prototype.manageDropdownScroll = function() {
+    var $dropdown = this.$dropdown();
+    var $selected = this.getSelectedDropdownOption();
+    var isLastItem = $selected.next().length === 0;
+    var isAboveTheScroll = $selected.position().top < 0;
+    var isBeyondTheScroll = $dropdown.scrollTop() + $selected.position().top + $selected.outerHeight() > $dropdown.scrollTop() + $dropdown.outerHeight();
+
+    if (isAboveTheScroll || isLastItem) {
+      $dropdown.scrollTop($dropdown.scrollTop() + $selected.position().top);
+    } else if (isBeyondTheScroll) {
+      $dropdown.scrollTop($dropdown.scrollTop() + $selected.outerHeight());
+    }
+  },
 
   Mentioner.prototype.serialize = function() {
     return this.$root.html();

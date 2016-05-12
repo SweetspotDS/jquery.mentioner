@@ -4,7 +4,7 @@
     var medium, $editor;
 
     before(function() {
-      medium = new MediumEditor('.js-editor', { placeholder: false, disableToolbar: true });
+      medium = new MediumEditor('.js-editor', { placeholder: false, toolbar: false });
       $editor = $( '.js-editor' ).mentioner({
         editor: medium,
         requester: function(callback) {

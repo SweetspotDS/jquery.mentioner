@@ -3,7 +3,9 @@
 
 .mentioner__dropdown {
   margin: 0;
+  max-height: 250px;
   max-width: 250px;
+  overflow-y: scroll;
   padding: 0;
   position: absolute;
   z-index: 99999;

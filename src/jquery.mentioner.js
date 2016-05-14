@@ -350,15 +350,15 @@
   Mentioner.prototype.createDropdownOption = function(mentionable) {
     var $item = $( '<li class="' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM + ' mentioner__dropdown__item"></li>' );
     var $name = $( '<p class="mentioner__dropdown__item__name">' + mentionable.name + '</p>' );
-    var $avatar = $([
-      '<div class="mentioner__dropdown__item__avatar">',
-      '<img class="mentioner__dropdown__item__avatar__image" src="' + mentionable.avatar + '" />',
-      '</div>'
-    ].join('\n'));
+    var $avatar;
 
-    $item.append($avatar);
-    $item.append($name);
-    $item.data('mentionable', mentionable);
+    if (mentionable.$avatar) {
+      $avatar = $( '<div class="mentioner__dropdown__item__avatar"></div>' );
+
+      $item.append($avatar.append(mentionable.$avatar));
+    }
+
+    $item.append($name).data('mentionable', mentionable);
 
     return $item;
   };

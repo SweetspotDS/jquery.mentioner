@@ -39,7 +39,7 @@ $mentioner-dropdown-item-selected-background-color: #f0f2f4;
 
   border-radius: 3px;
   cursor: pointer;
-  font-family: sans-serif;
+  font-family: inherit;
 }
 
 .mentioner__dropdown__item--help {
@@ -83,7 +83,7 @@ $mentioner-dropdown-item-selected-background-color: #f0f2f4;
   align-items: center;
   display: flex;
   height: $mentioner-avatar-size;
-  padding: 0 10px;
+  padding: 0 5px;
   width: $mentioner-avatar-size;
 }
 
@@ -96,7 +96,7 @@ $mentioner-dropdown-item-selected-background-color: #f0f2f4;
 
   background-color: #F5F5F5;
   outline: none;
-  font-family: sans-serif;
+  font-family: inherit;
 
   p {
     margin: 0;
@@ -104,12 +104,13 @@ $mentioner-dropdown-item-selected-background-color: #f0f2f4;
 }
 
 .mentioner__composer__mention {
-  background-color: #DADADA;
+  background-color: transparent;
   border: 0;
   font-size: $mentioner-font-size;
   line-height: 1.4;
 
   color: #000;
-  font-family: sans-serif;
+  font-family: inherit;
   text-align: center;
+  vertical-align: baseline;
 }

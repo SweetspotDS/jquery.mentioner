@@ -164,9 +164,10 @@
 
       var mentionable = $(this).data('mentionable');
       var inputId = new Date().getTime();
-      var inputWidth = that.getWidthForInput(mentionable.name);
+      var inputValue = that.mentionSymbol + mentionable.name;
+      var inputWidth = that.getWidthForInput(inputValue);
       var html = '<input id="' + inputId + '" data-mentionable-id="' + mentionable.id + '" value="' +
-        mentionable.name + '" style="width:' + inputWidth + 'px;" class="mentioner__composer__mention js-mention" disabled />';
+        inputValue + '" style="width:' + inputWidth + 'px;" class="mentioner__composer__mention js-mention" disabled />';
 
       that.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
 

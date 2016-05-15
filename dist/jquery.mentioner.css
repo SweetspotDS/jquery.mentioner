@@ -2,6 +2,7 @@
   position: relative; }
 
 .mentioner__dropdown {
+  border: solid 1px #e0e2e4;
   margin: 0;
   max-height: 244px;
   max-width: 244px;
@@ -11,9 +12,9 @@
   position: absolute;
   width: 244px;
   z-index: 99999;
-  background-color: white;
-  border-radius: 3px;
-  box-shadow: 0px 0px 5px #ADADAD;
+  background-color: #fff;
+  border-radius: 4px;
+  box-shadow: 0 5px 10px 0 rgba(0, 0, 0, 0.15);
   list-style-type: none; }
   .mentioner__dropdown--hidden {
     display: none; }
@@ -36,10 +37,10 @@
   background-color: #f0f2f4; }
 
 .mentioner__dropdown__item--help:hover {
-  background-color: white; }
+  background-color: #fff; }
 
 .mentioner__dropdown__item--selected--help {
-  background-color: white; }
+  background-color: #fff; }
 
 .mentioner__dropdown__item__name {
   margin: 0;

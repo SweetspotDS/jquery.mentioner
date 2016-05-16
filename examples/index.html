@@ -27,6 +27,12 @@
         margin: 0 auto;
         width: 400px;
       }
+
+      .avatar {
+        width: 100%;
+
+        border-radius: 50%;
+      }
     </style>
   </head>
   <body>
@@ -44,7 +50,12 @@
           placeholder: false,
           toolbar: false
         });
+
         var $composer = $( '.js-composer' );
+
+        var $avatar = function(src) {
+          return $( '<img class="avatar" src="' + src + '" />' );
+        };
 
         $composer.mentioner({
           editor: editor,
@@ -52,57 +63,57 @@
             var mentionables = [
               {
                 name: 'Jon Snow',
-                avatar: 'https://33.media.tumblr.com/avatar_b9a6fd7fe379_128.png',
+                $avatar: $avatar('./assets/jon-snow.jpg'),
                 id: 0
               },
               {
                 name: 'Daenerys Targaryen',
-                avatar: 'https://pbs.twimg.com/profile_images/535512430290673665/_pl2jNgF.jpeg',
+                $avatar: $avatar('./assets/daenerys.png'),
                 id: 1
               },
               {
                 name: 'Tyrion Lannister',
-                avatar: 'https://gp4.googleusercontent.com/-hBCcPT52DQk/AAAAAAAAAAI/AAAAAAAAAAA/22zJFbXDK6I/s48-c-k-no/photo.jpg?sz=50',
+                $avatar: $avatar('./assets/tyrion-lannister.jpg'),
                 id: 2
               },
               {
                 name: 'Cersei Lannister',
-                avatar: 'https://lh5.googleusercontent.com/-n5QJb1oEA1E/AAAAAAAAAAI/AAAAAAAAABI/jaoli3bi0oo/photo.jpg?sz=50',
+                $avatar: $avatar('./assets/cersei-lannister.jpg'),
                 id: 3
               },
               {
                 name: 'Jaime Lannister',
-                avatar: 'https://pbs.twimg.com/profile_images/2258491879/jaime-lannister-160_normal.jpg',
+                $avatar: $avatar('./assets/jaime-lannister.jpg'),
                 id: 4
               },
               {
                 name: 'Sansa Stark',
-                avatar: 'https://lh4.googleusercontent.com/-dUPMKG9P87E/AAAAAAAAAAI/AAAAAAAAdjI/sx0mvfffwR8/photo.jpg?sz=50',
+                $avatar: $avatar('./assets/sansa-stark.jpeg'),
                 id: 5
               },
               {
                 name: 'Arya Stark',
-                avatar: 'http://cheatsheetworld.com/img/entertainment/game-of-thrones/game-of-thrones-arya-stark.jpg',
+                $avatar: $avatar('./assets/arya-stark.jpeg'),
                 id: 6
               },
               {
                 name: 'Petyr Baelish',
-                avatar: 'https://pbs.twimg.com/profile_images/3523397119/465d65e7d353a4353fa0e0ef9e2f9948.png',
+                $avatar: $avatar('./assets/petyr-baelish.png'),
                 id: 7
               },
               {
                 name: 'Hodor',
-                avatar: 'https://lh4.googleusercontent.com/-vAOo9SxCZhI/AAAAAAAAAAI/AAAAAAAAByE/cNWt8OM10g0/photo.jpg?sz=50',
+                $avatar: $avatar('./assets/hodor.jpg'),
                 id: 8
               },
               {
                 name: 'Theon Greyjoy',
-                avatar: 'https://pbs.twimg.com/profile_images/2219229967/theon_normal.jpg',
+                $avatar: $avatar('./assets/theon-greyjoy.jpeg'),
                 id: 9
               },
               {
                 name: 'Melisandre',
-                avatar: 'http://cdn.images.express.co.uk/img/dynamic/galleries/64x64/55658.jpg',
+                $avatar: $avatar('./assets/melisandre.jpg'),
                 id: 10
               }
             ];

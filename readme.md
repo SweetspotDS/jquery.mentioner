@@ -40,7 +40,6 @@ A brand-new plugin for mentioning users by using jQuery and the [MediumEditor](h
 | ------ | :-------------: | ----------- |
 | editor | `undefined` | The related MediumEditor's instance |
 | minQueryLength | 1 | Minimun amount of characters needed to trigger the mentions dropdown |
-| maxMentionablesToShow | 5 | Maximum number of results shown on the dropdown |
 | mentionSymbol | @ | Symbol for triggering the mentions search |
 | requester | `undefined` | Function for requesting the mentionables collection |
 | matcher | Function for matching by different parts of the user's name | Function for defining how to select the results from the mentionables collection |

@@ -1,7 +1,9 @@
 $mentioner-font-size: 14px;
 $mentioner-avatar-size: 24px;
-$mentioner-dropdown-size: 250px;
+$mentioner-dropdown-base-size: 250px;
 $mentioner-dropdown-padding: 3px;
+$mentioner-dropdown-border-width: 1px;
+$mentioner-dropdown-size: $mentioner-dropdown-base-size - $mentioner-dropdown-padding * 2 - $mentioner-dropdown-border-width * 2;
 
 $mentioner-dropdown-border-color: #e0e2e4;
 $mentioner-dropdown-item-selected-background-color: #f0f2f4;
@@ -11,15 +13,14 @@ $mentioner-dropdown-item-selected-background-color: #f0f2f4;
 }
 
 .mentioner__dropdown {
-  border: solid 1px $mentioner-dropdown-border-color;
+  border: solid $mentioner-dropdown-border-width $mentioner-dropdown-border-color;
   margin: 0;
-  max-height: $mentioner-dropdown-size - $mentioner-dropdown-padding * 2;
-  max-width: $mentioner-dropdown-size - $mentioner-dropdown-padding * 2;
-  overflow-y: scroll;
+  max-height: $mentioner-dropdown-size;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: $mentioner-dropdown-padding;
   position: absolute;
-  width: $mentioner-dropdown-size - $mentioner-dropdown-padding * 2;
+  width: $mentioner-dropdown-size;
   z-index: 99999;
 
   background-color: #fff;

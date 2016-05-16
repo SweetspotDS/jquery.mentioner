@@ -4,13 +4,12 @@
 .mentioner__dropdown {
   border: solid 1px #e0e2e4;
   margin: 0;
-  max-height: 244px;
-  max-width: 244px;
-  overflow-y: scroll;
+  max-height: 242px;
+  overflow-y: auto;
   -webkit-overflow-scrolling: touch;
   padding: 3px;
   position: absolute;
-  width: 244px;
+  width: 242px;
   z-index: 99999;
   background-color: #fff;
   border-radius: 4px;

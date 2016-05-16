@@ -1,4 +1,4 @@
-/*! jquery.mentioner - v0.0.1 - 2016-05-12
+/*! jquery.mentioner - v0.0.1 - 2016-05-15
 * Copyright (c) 2016 MediaSQ; Licensed MIT */
 (function ($) {
   'use strict';
@@ -164,9 +164,10 @@
 
       var mentionable = $(this).data('mentionable');
       var inputId = new Date().getTime();
-      var inputWidth = that.getWidthForInput(mentionable.name);
+      var inputValue = that.mentionSymbol + mentionable.name;
+      var inputWidth = that.getWidthForInput(inputValue);
       var html = '<input id="' + inputId + '" data-mentionable-id="' + mentionable.id + '" value="' +
-        mentionable.name + '" style="width:' + inputWidth + 'px;" class="mentioner__composer__mention js-mention" disabled />';
+        inputValue + '" style="width:' + inputWidth + 'px;" class="mentioner__composer__mention js-mention" disabled />';
 
       that.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
 
@@ -345,15 +346,15 @@
   Mentioner.prototype.createDropdownOption = function(mentionable) {
     var $item = $( '<li class="' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM + ' mentioner__dropdown__item"></li>' );
     var $name = $( '<p class="mentioner__dropdown__item__name">' + mentionable.name + '</p>' );
-    var $avatar = $([
-      '<div class="mentioner__dropdown__item__avatar">',
-      '<img class="mentioner__dropdown__item__avatar__image" src="' + mentionable.avatar + '" />',
-      '</div>'
-    ].join('\n'));
+    var $avatar;
 
-    $item.append($avatar);
-    $item.append($name);
-    $item.data('mentionable', mentionable);
+    if (mentionable.$avatar) {
+      $avatar = $( '<div class="mentioner__dropdown__item__avatar"></div>' );
+
+      $item.append($avatar.append(mentionable.$avatar));
+    }
+
+    $item.append($name).data('mentionable', mentionable);
 
     return $item;
   };

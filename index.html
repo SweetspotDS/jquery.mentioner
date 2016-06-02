@@ -182,11 +182,6 @@
             <td class="table__cell">Minimun amount of characters needed to trigger the mentions dropdown</td>
           </tr>
           <tr>
-            <td class="table__cell"><code>maxMentionablesToShow</code></td>
-            <td class="table__cell"><code>5</code></td>
-            <td class="table__cell">Maximum number of results shown on the dropdown</td>
-          </tr>
-          <tr>
             <td class="table__cell"><code>mentionSymbol</code></td>
             <td class="table__cell"><code>@</code></td>
             <td class="table__cell">Symbol for triggering the mentions search</td>
@@ -200,6 +195,41 @@
             <td class="table__cell"><code>matcher</code></td>
             <td class="table__cell">Function for matching by different parts of the user's name</td>
             <td class="table__cell">Function for defining how to select the results from the mentionables collection</td>
+          </tr>
+        </tbody>
+      </table>
+    </section>
+
+    <section class="section">
+      <h2 class="subtitle">Mentionables</h2>
+      <p>Mentionables are expected to be loaded by using the <code>requester</code> function. This function receives a callback that should be invoked once the collection of mentionables is successfully built.</p>
+      <p>Each mentionable is supposed to be a plain JavaScript object containing the following properties:</p>
+      <table class="table">
+        <colgroup width="33%" />
+        <colgroup width="33%" />
+        <colgroup width="33%" />
+        <thead>
+          <tr>
+            <th class="table__cell">Property</th>
+            <th class="table__cell">Type</th>
+            <th class="table__cell">Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="table__cell"><code>name</code></td>
+            <td class="table__cell"><code>String</code></td>
+            <td class="table__cell">Value to be displayed</td>
+          </tr>
+          <tr>
+            <td class="table__cell"><code>id</code></td>
+            <td class="table__cell"><code>String</code></td>
+            <td class="table__cell">Unique identifier for each mentionable</td>
+          </tr>
+          <tr>
+            <td class="table__cell"><code>$avatar</code></td>
+            <td class="table__cell"><code>jQuery</code></td>
+            <td class="table__cell">A jQuery object representing an avatar (i.e. <code>img</code>)</td>
           </tr>
         </tbody>
       </table>
@@ -222,17 +252,17 @@
           <tr>
             <td class="table__cell"><code>serialize</code></td>
             <td class="table__cell"><code>String</code></td>
-            <td class="table__cell">Returns an HTML which represents the content of the mentioner container.</td>
+            <td class="table__cell">Returns an HTML which represents the content of the mentioner container</td>
           </tr>
           <tr>
             <td class="table__cell"><code>getMentions</code></td>
             <td class="table__cell"><code>Array</code></td>
-            <td class="table__cell">Returns an array with the collection of inserted mentions. Each mention is represented with the same object that its related mentionable.</td>
+            <td class="table__cell">Returns an array with the collection of inserted mentions. Each mention is represented with the same object that its related mentionable</td>
           </tr>
           <tr>
             <td class="table__cell"><code>triggerMention</code></td>
             <td class="table__cell"><code>undefined</code></td>
-            <td class="table__cell">When the mentioner is focused, it pastes the <code>mentionSymbol</code> and trigger the dropdown.</td>
+            <td class="table__cell">When the mentioner is focused, it pastes the <code>mentionSymbol</code> and trigger the dropdown</td>
           </tr>
         </tbody>
       </table>

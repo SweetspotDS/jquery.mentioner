@@ -40,10 +40,38 @@ A brand-new plugin for mentioning users by using jQuery and the [MediumEditor](h
 | ------ | :-------------: | ----------- |
 | editor | `undefined` | The related MediumEditor's instance |
 | minQueryLength | 1 | Minimun amount of characters needed to trigger the mentions dropdown |
-| maxMentionablesToShow | 5 | Maximum number of results shown on the dropdown |
 | mentionSymbol | @ | Symbol for triggering the mentions search |
 | requester | `undefined` | Function for requesting the mentionables collection |
 | matcher | Function for matching by different parts of the user's name | Function for defining how to select the results from the mentionables collection |
+
+## Mentionables
+
+Mentionables are expected to be loaded by using the `requester` function. This function receives a callback that should be invoked once the collection of mentionables is successfully built.
+
+Each mentionable is supposed to be a plain JavaScript object containing the following properties:
+
+| Property | Type | Description |
+| -------- | ---- | ----------- |
+| name | `String` | Value to be displayed |
+| id | `String` | Unique identifier for each mentionable |
+| $avatar | `jQuery` | A jQuery object representing an avatar (i.e. `img`) |
+
+Every additional property will be also returned when retrieving the inserted mentions.
+
+```js
+requester: function(callback) {
+  var mentionables = [
+    {
+      $avatar: $('<img src="whatever" />'),
+      company: 'The Wall',
+      name: 'Jon Snow',
+      id: '1'
+    }
+  ];
+
+  callback(mentionables);
+}
+```
 
 ## API
 

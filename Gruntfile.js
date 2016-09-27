@@ -73,7 +73,7 @@ module.exports = function (grunt) {
   });
 
   // Default task.
-  grunt.registerTask('default', ['eslint', 'connect', 'clean', 'concat', 'sass', 'uglify']);
+  grunt.registerTask('default', ['eslint', 'clean', 'concat', 'sass', 'uglify']);
   grunt.registerTask('server', function () {
     grunt.log.warn('The `server` task has been deprecated. Use `grunt serve` to start a server.');
     grunt.task.run(['serve']);

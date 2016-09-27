@@ -2,6 +2,11 @@
 
 A brand-new plugin for mentioning users by using jQuery and the [MediumEditor](https://github.com/yabwe/medium-editor).
 
+## Runtime dependencies
+
+* [jQuery](http://jquery.com/)
+* [MediumEditor](https://github.com/yabwe/medium-editor)
+
 ## Getting Started
 
 ```html

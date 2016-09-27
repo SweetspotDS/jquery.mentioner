@@ -1,4 +1,4 @@
-/*! jquery.mentioner - v0.0.1 - 2016-05-15
+/*! jquery.mentioner - v1.0.1 - 2016-09-27
 * Copyright (c) 2016 MediaSQ; Licensed MIT */
 (function ($) {
   'use strict';
@@ -78,8 +78,8 @@
     this.editor.subscribe('editableKeydown', this.onRootKeydown.bind(this));
     this.editor.subscribe('editableKeydownEnter', this.onRootKeydownEnter.bind(this));
 
-    this.$dropdown().on('mousedown', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_HELP_ITEM, this.onDropdownHelpItemMousedown.bind(this));
-    this.$dropdown().on('mousedown', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemMousedown());
+    this.$dropdown().on('mousedown touchstart', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_HELP_ITEM, this.onDropdownHelpItemMousedown.bind(this));
+    this.$dropdown().on('mousedown touchstart', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemMousedown());
   };
 
   Mentioner.prototype.onRootBlur = function() {

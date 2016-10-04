@@ -387,7 +387,7 @@
   };
 
   Mentioner.prototype.getSelectedDropdownOption = function() {
-    return this.$dropdown().find('.mentioner__dropdown__item--selected');
+    return this.$dropdown().find('.mentioner__dropdown__item--selected, .' + MENTIONER_HOOK_CLASSES.DROPDOWN_HELP_ITEM);
   };
 
   Mentioner.prototype.getStyleForDropdown = function() {

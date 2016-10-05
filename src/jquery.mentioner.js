@@ -87,7 +87,8 @@
     this.$dropdown().on('mousedown touchstart', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_HELP_ITEM, this.onDropdownHelpItemMousedown.bind(this));
     this.$dropdown().on('mousedown touchstart', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemMousedown.bind(this));
 
-    this.$dropdown().on('click', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemClick.bind(this));
+    this.$dropdown().on('click touchend', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemClick.bind(this));
+    this.$dropdown().on('touchmove', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemTouchmove.bind(this));
   };
 
   Mentioner.prototype.onRootBlur = function() {
@@ -125,6 +126,8 @@
   Mentioner.prototype.onEditableKeyup = function(event) {
     if (event.keyCode === KEYS.RETURN) {
       this.dropdownEventWrapper(event, function() {
+        this.currentEditorSelection = this.editor.exportSelection();
+
         this.getSelectedDropdownOption().trigger('click');
       });
     }
@@ -172,12 +175,18 @@
     this.currentEditorSelection = this.editor.exportSelection();
   };
 
+  Mentioner.prototype.onDropdownItemTouchmove = function() {
+    this.currentEditorSelection = null;
+  };
+
   Mentioner.prototype.onDropdownItemClick = function(event) {
     event.preventDefault();
 
-    this.$root.focus();
-    this.editor.importSelection(this.currentEditorSelection);
-    this.currentEditorSelection = null;
+    if (!this.currentEditorSelection) {
+      return; // We don't know where to paste the mention
+    }
+
+    this.restoreFocus();
 
     var mentionable = $(event.currentTarget).data('mentionable');
     var inputId = new Date().getTime();
@@ -194,6 +203,14 @@
     this.recalculateSelection(selection, removed);
 
     this.hideDropdown();
+  };
+
+  Mentioner.prototype.restoreFocus = function() {
+    this.$root.focus();
+
+    this.editor.importSelection(this.currentEditorSelection);
+
+    this.currentEditorSelection = null;
   };
 
   Mentioner.prototype.recalculateSelection = function(oldSelection, removedText) {

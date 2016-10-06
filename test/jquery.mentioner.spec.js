@@ -123,7 +123,7 @@
           medium.trigger('editableKeyup', event, $editor);
 
           var $input = $editor.find('input');
-          $input.val().should.equal(selectedItemText);
+          $input.val().should.equal('@' + selectedItemText);
         });
 
         it('inserts a &nbsp; entity after adding a new mention', function() {

@@ -1,4 +1,4 @@
-/*! jquery.mentioner - v0.0.1 - 2016-05-15
+/*! jquery.mentioner - v1.0.2 - 2016-10-05
 * Copyright (c) 2016 MediaSQ; Licensed MIT */
 (function ($) {
   'use strict';
@@ -21,6 +21,7 @@
 
   var Mentioner = function($root, settings) {
     this.$root = $root;
+    this.currentEditorSelection = null;
 
     this.lastKeyDown = null;
     this.editor = settings.editor;
@@ -78,12 +79,17 @@
     this.editor.subscribe('editableKeydown', this.onRootKeydown.bind(this));
     this.editor.subscribe('editableKeydownEnter', this.onRootKeydownEnter.bind(this));
 
-    this.$dropdown().on('mousedown', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_HELP_ITEM, this.onDropdownHelpItemMousedown.bind(this));
-    this.$dropdown().on('mousedown', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemMousedown());
+    this.$dropdown().on('mousedown touchstart', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_HELP_ITEM, this.onDropdownHelpItemMousedown.bind(this));
+    this.$dropdown().on('mousedown touchstart', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemMousedown.bind(this));
+
+    this.$dropdown().on('click touchend', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemClick.bind(this));
+    this.$dropdown().on('touchmove', '.' + MENTIONER_HOOK_CLASSES.DROPDOWN_ITEM, this.onDropdownItemTouchmove.bind(this));
   };
 
   Mentioner.prototype.onRootBlur = function() {
     this.hideDropdown();
+
+    this.currentEditorSelection = null;
   };
 
   Mentioner.prototype.onEditableInput = function() {
@@ -115,7 +121,9 @@
   Mentioner.prototype.onEditableKeyup = function(event) {
     if (event.keyCode === KEYS.RETURN) {
       this.dropdownEventWrapper(event, function() {
-        this.getSelectedDropdownOption().trigger('mousedown');
+        this.currentEditorSelection = this.editor.exportSelection();
+
+        this.getSelectedDropdownOption().trigger('click');
       });
     }
   };
@@ -152,32 +160,52 @@
     this.dropdownEventWrapper(event, $.noop);
   };
 
-  Mentioner.prototype.onDropdownHelpItemMousedown = function (event) {
-    this.dropdownEventWrapper(event, $.noop);
+  Mentioner.prototype.onDropdownHelpItemMousedown = function(event) {
+    event.preventDefault();
   };
 
-  Mentioner.prototype.onDropdownItemMousedown = function() {
-    var that = this;
+  Mentioner.prototype.onDropdownItemMousedown = function(event) {
+    event.preventDefault();
 
-    return function(event) {
-      event.preventDefault();
+    this.currentEditorSelection = this.editor.exportSelection();
+  };
 
-      var mentionable = $(this).data('mentionable');
-      var inputId = new Date().getTime();
-      var inputValue = that.mentionSymbol + mentionable.name;
-      var inputWidth = that.getWidthForInput(inputValue);
-      var html = '<input id="' + inputId + '" data-mentionable-id="' + mentionable.id + '" value="' +
-        inputValue + '" style="width:' + inputWidth + 'px;" class="mentioner__composer__mention js-mention" disabled />';
+  Mentioner.prototype.onDropdownItemTouchmove = function() {
+    this.currentEditorSelection = null;
+  };
 
-      that.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
+  Mentioner.prototype.onDropdownItemClick = function(event) {
+    event.preventDefault();
 
-      var selection = that.editor.exportSelection();
-      var removed = that.clearMentionTextTrigger(selection);
-      that.addBlankAfterMention(inputId);
-      that.recalculateSelection(selection, removed);
+    if (!this.currentEditorSelection) {
+      return; // We don't know where to paste the mention
+    }
 
-      that.hideDropdown();
-    };
+    this.restoreFocus();
+
+    var mentionable = $(event.currentTarget).data('mentionable');
+    var inputId = new Date().getTime();
+    var inputValue = this.mentionSymbol + mentionable.name;
+    var inputWidth = this.getWidthForInput(inputValue);
+    var html = '<input id="' + inputId + '" data-mentionable-id="' + mentionable.id + '" value="' +
+      inputValue + '" style="width:' + inputWidth + 'px;" class="mentioner__composer__mention js-mention" disabled />';
+
+    this.editor.pasteHTML(html, { forcePlainText: false, cleanAttrs: [] });
+
+    var selection = this.editor.exportSelection();
+    var removed = this.clearMentionTextTrigger(selection);
+    this.addBlankAfterMention(inputId);
+    this.recalculateSelection(selection, removed);
+
+    this.hideDropdown();
+  };
+
+  Mentioner.prototype.restoreFocus = function() {
+    this.$root.focus();
+
+    this.editor.importSelection(this.currentEditorSelection);
+
+    this.currentEditorSelection = null;
   };
 
   Mentioner.prototype.recalculateSelection = function(oldSelection, removedText) {
@@ -371,7 +399,7 @@
   };
 
   Mentioner.prototype.getSelectedDropdownOption = function() {
-    return this.$dropdown().find('.mentioner__dropdown__item--selected');
+    return this.$dropdown().find('.mentioner__dropdown__item--selected, .' + MENTIONER_HOOK_CLASSES.DROPDOWN_HELP_ITEM);
   };
 
   Mentioner.prototype.getStyleForDropdown = function() {

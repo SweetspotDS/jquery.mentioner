@@ -469,10 +469,19 @@
     });
   };
 
+  Mentioner.prototype.isEmpty = function () {
+    return this.serialize() === '';
+  };
+
   Mentioner.prototype.triggerMention = function () {
     this.lastKeyDown = null; // Reset the lastKeyDown variable for preventing
                              // false values from the last interaction.
-    this.editor.cleanPaste(this.mentionSymbol);
+
+    if (this.isEmpty()) {
+      this.editor.pasteHTML('<p>' + this.mentionSymbol + '</p>');
+    } else {
+      this.editor.cleanPaste(this.mentionSymbol);
+    }
   };
 
   var Api = function($root, settings) {

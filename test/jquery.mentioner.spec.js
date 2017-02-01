@@ -225,6 +225,24 @@
             $dropdown.hasClass('mentioner__dropdown--hidden').should.be.false;
             $dropdown.find('.js-mentioner-dropdown-help-item').should.exist;
           });
+
+          it('wraps the text in a <p> when mention by using the button first thing in the comment', function() {
+            // Clean up the textbox and call 'triggerMention' to add the '@'
+            $editor.empty();
+            $editor.focus();
+            $editor.mentioner('triggerMention');
+
+            // Set the event to select option
+            var event = $.Event('keyup', {
+              keyCode: 13 // RETURN
+            });
+
+            // Choose selected option
+            medium.trigger('editableKeyup', event, $editor);
+
+            // Spec condition
+            $editor.html().startsWith('<p>').should.be.true;
+          });
         });
       });
     });

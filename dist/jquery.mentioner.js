@@ -1,4 +1,4 @@
-/*! jquery.mentioner - v1.0.2 - 2017-02-01
+/*! jquery.mentioner - v1.0.3 - 2017-02-02
 * Copyright (c) 2017 MediaSQ; Licensed MIT */
 (function ($) {
   'use strict';

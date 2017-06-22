@@ -170,6 +170,13 @@
           var $dropdown = $( '.js-mentioner-dropdown' );
           $dropdown.hasClass('mentioner__dropdown--hidden').should.be.true;
         });
+
+        it('does not show the dropdown when the mentionSymbol is next to text', function() {
+          medium.cleanPaste('Hi@Jon');
+
+          var $dropdown = $( '.js-mentioner-dropdown' );
+          $dropdown.hasClass('mentioner__dropdown--hidden').should.be.true;
+        });
       });
 
       describe('Working with the public API', function() {

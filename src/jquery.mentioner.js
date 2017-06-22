@@ -102,9 +102,10 @@
     var selection = this.editor.exportSelection();
     var preSelectionText = text.slice(0, selection.end);
     var lastMentionSymbolIndex = preSelectionText.lastIndexOf(this.mentionSymbol);
+    var mentionSymbolContext = preSelectionText.slice(lastMentionSymbolIndex - 1, lastMentionSymbolIndex);
     var query = preSelectionText.slice(lastMentionSymbolIndex + 1);
 
-    if (lastMentionSymbolIndex > -1 && this.lastKeyDown !== KEYS.RETURN) {
+    if (lastMentionSymbolIndex > -1 && this.lastKeyDown !== KEYS.RETURN && this.isValidMentionSymbolContext(mentionSymbolContext)) {
       if (query.length >= this.minQueryLength) {
         this.search(query);
       } else {
@@ -203,6 +204,10 @@
     this.recalculateSelection(selection, removed);
 
     this.hideDropdown();
+  };
+
+  Mentioner.prototype.isValidMentionSymbolContext = function(char) {
+    return /^$|[^A-Za-z0-9]/.test(char);
   };
 
   Mentioner.prototype.restoreFocus = function() {

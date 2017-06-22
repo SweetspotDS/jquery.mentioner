@@ -2,7 +2,7 @@
  *
  *
  *
- * Copyright (c) 2016 MediaSQ
+ * Copyright (c) 2017 MediaSQ
  * Licensed under the MIT license.
  */
 (function ($) {

@@ -1,6 +1,5 @@
 (function ($) {
   describe('jQuery#mentioner', function() {
-
     var medium, $editor;
 
     before(function() {
@@ -24,7 +23,6 @@
     });
 
     describe('DOM structure', function() {
-
       it('has a valid parent wrapper', function() {
         $editor.parent().hasClass('js-mentioner-wrapper').should.be.true;
       });
@@ -32,11 +30,9 @@
       it('has a dropdown sibling', function() {
         $editor.next().hasClass('js-mentioner-dropdown').should.be.true;
       });
-
     });
 
     describe('Dropdown', function() {
-
       var $candidates;
 
       before(function() {
@@ -63,11 +59,9 @@
           index.should.not.equal(-1);
         });
       });
-
     });
 
     describe('Editor', function() {
-
       describe('Navigate through the dropdown', function() {
         it('goes to the bottom when there are not any previous sibling', function() {
           var event = $.Event('keydown', {
@@ -144,7 +138,6 @@
 
           index.should.equal(-1);
         });
-
       });
 
       describe('Writing text', function() {
@@ -178,6 +171,12 @@
           $dropdown.hasClass('mentioner__dropdown--hidden').should.be.true;
         });
 
+        it('does not show the dropdown when the mentionSymbol is next to text', function() {
+          medium.cleanPaste('Hi@Jon');
+
+          var $dropdown = $( '.js-mentioner-dropdown' );
+          $dropdown.hasClass('mentioner__dropdown--hidden').should.be.true;
+        });
       });
 
       describe('Working with the public API', function() {
@@ -187,7 +186,6 @@
         });
 
         describe('#getMentions', function() {
-
           it('returns an empty array when there aren\'t any inserted mentions', function() {
             var mentions = $editor.mentioner('getMentions');
             mentions.should.eql([]);
@@ -200,11 +198,9 @@
             var mentions = $editor.mentioner('getMentions');
             mentions.length.should.equal(1);
           });
-
         });
 
         describe('#serialize', function() {
-
           it('serializes the content of the editor and returns its HTML', function() {
             medium.cleanPaste('serialize me!');
             var html = $editor.mentioner('serialize');
@@ -212,11 +208,9 @@
 
             html.should.equal(expectedHtml);
           });
-
         });
 
         describe('#triggerMention', function() {
-
           it('pastes a mentionSymbol and show the dropdown with the help message', function() {
             var $dropdown = $( '.js-mentioner-dropdown' );
 

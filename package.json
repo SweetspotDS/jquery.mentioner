@@ -1,6 +1,6 @@
 {
   "name": "jquery.mentioner",
-  "version": "1.0.3",
+  "version": "1.1.0",
   "description": "jquery.mentioner",
   "keywords": [
     "jquery-plugin",
@@ -10,7 +10,7 @@
   ],
   "author": {
     "name": "MediaSQ",
-    "email": "developers@mediasq.com",
+    "email": "developers@sweetspot.com",
     "url": "https://github.com/mediasq"
   },
   "repository": "mediasq/jquery.mentioner",
